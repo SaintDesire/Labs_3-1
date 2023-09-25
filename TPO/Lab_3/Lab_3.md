@@ -19,7 +19,7 @@
 <strong>Фактические результаты: </strong> Надпись "Что-то пошло не так...", но после 
 обновления страницы, вход в аккаунт, а, соответственно, и регистрация были выполнены
 успешно!<br>
-<img height="240" title="img with result"  src="C:\Users\nikit\OneDrive\Рабочий стол\Screenshot_2.png"/><br>
+<img height="240" title="img with result"  src="Screenshot_2.png"/><br>
 <strong>Статус: </strong> тест пройден частично<br>
 
 <hr>
@@ -41,6 +41,6 @@
 в верхней навигационной панели появился символ "+1"
 возле соответствующего пункта меню. При переходе в него, там будет находится выбранный 
 нами товар:<br>
-<img height="140" width="170" title="img with result"  src="C:\Users\nikit\OneDrive\Рабочий стол\Screenshot_1.png"/><br>
+<img height="140" width="170" title="img with result"  src="Screenshot_1.png"/><br>
 <strong>Фактические результаты: </strong> как ожидали<br>
 <strong>Статус: </strong> пройден успешно<br>
