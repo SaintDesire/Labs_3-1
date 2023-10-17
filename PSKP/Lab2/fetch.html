@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch API Example</title>
+</head>
+<body>
+<h1>Данные из GET-запроса:</h1>
+<p id="fio"></p>
+
+<script>
+    let input = document.getElementById("fio");
+    fetch('/api/name')
+        .then(response => response.text()) // обработка ответа от сервера, корвертация его в текст.
+        .then(responseText => { console.log(responseText); input.innerHTML = responseText });
+</script>
+</body>
+</html>

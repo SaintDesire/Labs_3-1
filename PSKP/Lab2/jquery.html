@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jQuery AJAX Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Данные из GET-запроса с использованием jQuery:</h1>
+<p id="nameData"></p>
+
+<script>
+    $.ajax({
+        url: 'http://localhost:5000/api/name',
+        method: 'GET',
+        success: function(data) {
+            $('#nameData').text(data);
+        },
+        error: function(error) {
+            console.error('Ошибка:', error);
+        }
+    });
+</script>
+</body>
+</html>

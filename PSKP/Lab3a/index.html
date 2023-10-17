@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Factorial</title>
+</head>
+<body>
+<h1>Результаты вычисления факториалов:</h1>
+<ul id="results"></ul>
+
+<script>
+    const resultsList = document.getElementById("results");
+    let totalDuration = 0;
+
+    async function calculateFactorials() {
+        for (let x = 1; x <= 20; x++) {
+            const startTime = performance.now();
+            const response = await fetch(`/fact?k=${x}`);
+            const data = await response.json();
+            const duration = performance.now() - startTime;
+            totalDuration += duration;
+
+            const resultItem = document.createElement("li");
+            resultItem.textContent = `${duration.toFixed(2)}ms - ${x}/${data.k}! = ${data.fact}`;
+            resultsList.appendChild(resultItem);
+        }
+
+        const totalDurationItem = document.createElement("li");
+        totalDurationItem.textContent = `Общая продолжительность: ${totalDuration.toFixed(2)}ms`;
+        resultsList.appendChild(totalDurationItem);
+    }
+
+    calculateFactorials();
+</script>
+</body>
+</html>

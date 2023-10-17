@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 4 EventEmmiter</title>
+</head>
+<body>
+<h1>Lab 4 EventEmmiter</h1>
+
+<form id="crudForm">
+    <label for="id">ID:</label>
+    <input type="text" id="id" name="id" required>
+    <button type="button" onclick="getDataByID()">Get Data By ID</button>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="bday">Birthday:</label>
+    <input type="date" id="bday" name="bday" required>
+
+    <button type="button" onclick="getData()">Get Data</button>
+    <button type="button" onclick="addData()">Add Data</button>
+    <button type="button" onclick="updateData()">Update Data</button>
+    <button type="button" onclick="deleteData()">Delete Data</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    function getDataByID() {
+        const id = document.getElementById('id').value;
+
+        fetch(`http://localhost:5000/api/db?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('name').value = data.name;
+                    document.getElementById('bday').value = data.bday;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    function getData() {
+        fetch('http://localhost:5000/api/db')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Функция для отправки POST-запроса
+    function addData() {
+        const name = document.getElementById('name').value;
+        const bday = document.getElementById('bday').value;
+
+        const newData = { name, bday };
+
+        fetch('http://localhost:5000/api/db', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Функция для отправки PUT-запроса
+    function updateData() {
+        const id = document.getElementById('id').value;
+        const name = document.getElementById('name').value;
+        const bday = document.getElementById('bday').value;
+
+        const updatedData = { name, bday };
+
+        fetch(`http://localhost:5000/api/db?id=${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Функция для отправки DELETE-запроса
+    function deleteData() {
+        const id = prompt('Enter ID to delete:');
+
+        fetch(`http://localhost:5000/api/db?id=${id}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>
