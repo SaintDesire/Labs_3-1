@@ -20,26 +20,27 @@ select * from dba_pdbs;
 alter session set container = KNI_PDB;
 alter pluggable database KNI_PDB open;
 alter session set "_ORACLE_SCRIPT" = true;
+
 alter session set container = CDB$ROOT; --вернутся к истокам
 
 show con_name;
 
--- tablespaces
-create tablespace KNI_PDB_TS
-  datafile 'KNI_PDB_TS.dbf'
+create tablespace TS_KNI_Lb3
+  datafile 'TS_KNI_Lb3.dbf'
   size 10M
   autoextend on next 5M
   maxsize 50M;
   
-create temporary tablespace KNI_PDB_TS_TEMP
-  tempfile 'KNI_PDB_TS_TEMP.dbf'
+create temporary tablespace TS_KNI_TEMP_Lb3
+  tempfile 'TS_KNI_TEMP_Lb3.dbf'
   size 5M
   autoextend on next 2M
   maxsize 40M;
 
 select * from dba_tablespaces where TABLESPACE_NAME like '%KNI%';
-drop tablespace KNI_PDB_TS including contents and datafiles;
-drop tablespace KNI_PDB_TS_TEMP including contents and datafiles;
+
+drop tablespace TS_KNI_Lb3 including contents and datafiles;
+drop tablespace TS_KNI_TEMP_Lb3 including contents and datafiles;
 
 -- role
 create role KNI_PDB_RL;
@@ -59,7 +60,6 @@ to KNI_PDB_RL;
 select * from dba_roles where ROLE like '%RL%';
 drop role KNI_PDB_RL;
 
--- profile
 create profile KNI_PDB_PROFILE limit
   password_life_time 365
   sessions_per_user 3
@@ -70,24 +70,22 @@ create profile KNI_PDB_PROFILE limit
   
 select * from dba_profiles where PROFILE like '%KNI_PDB_PROFILE%';
 drop profile KNI_PDB_PROFILE;
-
+  
 -- user
 create user U1_KNI_PDB 
     identified by 111
-    default tablespace KNI_PDB_TS 
-    quota unlimited on KNI_PDB_TS
-    temporary tablespace KNI_PDB_TS_TEMP
+    default tablespace TS_KNI_Lb3 
+    quota unlimited on TS_KNI_Lb3
+    temporary tablespace TS_KNI_TEMP_Lb3
     profile KNI_PDB_PROFILE
     account unlock
     password expire;
-
+    
     
 grant 
-    CREATE SESSION,
     KNI_PDB_RL,
     SYSDBA
-to U1_KNI_PDB;
-
+to U1_KNI_PDB; 
 
 select * from dba_users where USERNAME like '%U1%';
 drop user U1_KNI_PDB;
@@ -111,6 +109,7 @@ drop table  KNI_PDB_TABLE;
 -- 8
 select * from dba_tablespaces;
 select * from dba_data_files;
+select * from dba_temp_files;
 select * from dba_roles where ROLE like 'KNI%';
 select * from dba_sys_privs where GRANTEE like 'KNI%';
 select * from dba_profiles where PROFILE like 'KNI%';

@@ -1,0 +1,6 @@
+﻿  OS05_02.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab5\OS05_02\OS05_02.cpp(36,12): warning C4244: аргумент: преобразование "DWORD_PTR" в "int", возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab5\OS05_02\OS05_02.cpp(38,12): warning C4244: аргумент: преобразование "DWORD_PTR" в "int", возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab5\OS05_02\OS05_02.cpp(47,12): warning C4244: аргумент: преобразование "DWORD_PTR" в "int", возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab5\OS05_02\OS05_02.cpp(49,12): warning C4244: аргумент: преобразование "DWORD_PTR" в "int", возможна потеря данных
+  OS05_02.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab5\x64\Debug\OS05_02.exe
