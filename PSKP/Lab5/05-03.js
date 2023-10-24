@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { send } = require('./m06_KNI');
+const { send } = require('@p1v0var/m06_kni');
 
 const app = express();
 const port = 5000;

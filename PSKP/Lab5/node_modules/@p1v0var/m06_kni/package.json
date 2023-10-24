@@ -1,12 +1,13 @@
 {
   "name": "@p1v0var/m06_kni",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "m06_KNI.js",
   "private": false,
   "dependencies": {
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "nodemailer": "^6.9.6",
-    "nodemailer-direct-transport": "^3.3.2"
+    "nodemailer-direct-transport": "^3.0.7"
   }
 }
