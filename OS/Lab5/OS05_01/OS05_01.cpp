@@ -1,5 +1,4 @@
-﻿
-#include <iostream>
+﻿#include <iostream>
 #include <Windows.h>
 #include <bitset>
 
@@ -10,36 +9,33 @@ int main()
     auto process = GetCurrentProcess();
     auto thread = GetCurrentThread();
 
-    // Получаем маску доступных процессу процессоров
     DWORD_PTR processAffinityMask;
     DWORD_PTR systemAffinityMask;
 
-
-    std::cout << "-	идентификатор текущего процесса: " << GetCurrentProcessId()
-        << "\n-	идентификатор текущего (main) потока: " << GetCurrentThreadId()
-        << "\n-	приоритет (приоритетный класс) текущего процесса: " << GetPriorityClass(process)
-        << "\n-	приоритет текущего потока: " << GetThreadPriority(thread);
-
+    std::cout << "- Current process ID: " << GetCurrentProcessId()
+        << "\n- Current (main) thread ID: " << GetCurrentThreadId()
+        << "\n- Priority (priority class) of the current process: " << GetPriorityClass(process)
+        << "\n- Priority of the current thread: " << GetThreadPriority(thread);
 
     if (GetProcessAffinityMask(process, &processAffinityMask, &systemAffinityMask)) {
-        // Преобразуем маску в строку в двоичном виде
+        // Convert the mask to a binary string
         std::string binaryString = std::bitset<sizeof(DWORD_PTR) * 8>(processAffinityMask).to_string();
 
-        // Удаляем ведущие нули
+        // Remove leading zeros
         size_t firstNonZero = binaryString.find_first_not_of('0');
         if (firstNonZero != std::string::npos) {
             binaryString = binaryString.substr(firstNonZero);
         }
 
-        std::cout << "\n- Маска доступных процессу процессоров (в двоичном виде): " << binaryString << "\n";
+        std::cout << "\n- Mask of processors available to the process (in binary): " << binaryString << "\n";
     }
     else {
         DWORD error = GetLastError();
-        std::cerr << "\nОшибка при получении маски доступных процессу процессоров. Код ошибки: " << error << "\n";
+        std::cerr << "\nError getting the processor affinity mask for the process. Error code: " << error << "\n";
     }
 
     if (GetProcessAffinityMask(process, &processAffinityMask, &systemAffinityMask)) {
-        // Считаем количество установленных битов в маске
+        // Count the number of set bits in the mask
         int processorCount = 0;
         DWORD_PTR mask = 1;
         while (mask != 0) {
@@ -48,15 +44,14 @@ int main()
             }
             mask <<= 1;
         }
-        std::cout << "\n- Количество процессоров, доступных процессу: " << processorCount << "\n";
+        std::cout << "\n- Number of processors available to the process: " << processorCount << "\n";
     }
     else {
         DWORD error = GetLastError();
-        std::cerr << "\n Ошибка при получении маски доступных процессу процессоров. Код ошибки: " << error << "\n";
+        std::cerr << "\nError getting the processor affinity mask for the process. Error code: " << error << "\n";
     }
 
-    std::cout << "\n- процессор, назначенный текущему потоку: " << GetCurrentProcessorNumber() << "\n";
+    std::cout << "\n- Processor assigned to the current thread: " << GetCurrentProcessorNumber() << "\n";
 
     system("pause");
 }
-

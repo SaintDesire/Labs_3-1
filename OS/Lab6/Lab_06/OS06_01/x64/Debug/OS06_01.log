@@ -1,0 +1,16 @@
+﻿  main.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(18,2): error C4235: использовано нестандартное расширение: ключевое слово "__asm" данной архитектурой не поддерживается
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(21,3): error C2065: lock: необъявленный идентификатор
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(21,8): error C2146: синтаксическая ошибка: отсутствие ";" перед идентификатором "bts"
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(21,8): error C2065: bts: необъявленный идентификатор
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(21,12): error C2146: синтаксическая ошибка: отсутствие ";" перед идентификатором "check"
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(22,3): error C2065: jc: необъявленный идентификатор
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(22,6): error C2146: синтаксическая ошибка: отсутствие ";" перед идентификатором "CriticalSection"
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(22,6): error C2065: CriticalSection: необъявленный идентификатор
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(23,2): error C2143: синтаксическая ошибка: отсутствие ";" перед "}"
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(28,2): error C4235: использовано нестандартное расширение: ключевое слово "__asm" данной архитектурой не поддерживается
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(28,7): error C2065: lock: необъявленный идентификатор
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(28,12): error C2146: синтаксическая ошибка: отсутствие ";" перед идентификатором "btr"
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(28,12): error C2065: btr: необъявленный идентификатор
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(28,16): error C2146: синтаксическая ошибка: отсутствие ";" перед идентификатором "check"
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab6\Lab_06\OS06_01\main.cpp(29,1): error C2143: синтаксическая ошибка: отсутствие ";" перед "}"
