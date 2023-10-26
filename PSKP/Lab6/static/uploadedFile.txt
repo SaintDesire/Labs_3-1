@@ -1,0 +1,6 @@
+------WebKitFormBoundary6o24fLcQZsAnEgPB
+Content-Disposition: form-data; name="file"; filename="uploadedFile.txt"
+Content-Type: text/plain
+
+Hello World!
+------WebKitFormBoundary6o24fLcQZsAnEgPB--

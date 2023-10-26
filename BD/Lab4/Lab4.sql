@@ -5,7 +5,7 @@ select TABLESPACE_NAME, FILE_NAME from SYS.DBA_DATA_FILES;
 select TABLESPACE_NAME, FILE_NAME from SYS.DBA_TEMP_FILES;
 
 -- 2. Создайте табличное пространство с именем XXX_QDATA (10m). 
--- При создании установите его в состояние offline. 
+-- При создании установите его в состояние offline.
 -- Затем переведите табличное пространство в состояние online. 
 -- Выделите пользователю XXX квоту 2m в пространстве XXX_QDATA. 
 -- От имени XXX в  пространстве XXX_T1создайте таблицу из двух столбцов, 
@@ -83,10 +83,7 @@ drop tablespace KNI_QDATA including contents and datafiles;
 
 -- 9. Получите перечень всех групп журналов повтора. Определите текущую группу журналов повтора.
 
--- Вывело 1 2 3 - это означает, что в БД есть три группы журналов (log groups) 
--- с номерами 1, 2 и 3.
 select group# from v$logfile;
--- Текущий - 2
 select group# from v$log where status = 'CURRENT';
 
 -- 10. Получите перечень файлов всех журналов повтора инстанса.
@@ -95,9 +92,8 @@ select member from v$logfile;
 -- 11. EX. С помощью переключения журналов повтора пройдите полный цикл переключений. 
 -- Запишите серверное время в момент вашего первого переключения (оно понадобится для выполнения следующих заданий).
 
--- Нужно просто пройти путь изменения статуса
 select group#, status from v$log;
-alter system switch logfile; -- выполнить 2 раза и следить, где в v$log status = 'CURRENT'
+alter system switch logfile;
 select TO_CHAR(SYSDATE, 'HH24:MI DD MONTH YYYY') as current_date from DUAL;
 --10:01 26 ОКТЯБРЬ  2023
 select group# from v$log where status = 'CURRENT';
@@ -105,6 +101,7 @@ select group# from v$log where status = 'CURRENT';
 -- 12. EX. Создайте дополнительную группу журналов повтора с тремя файлами журнала. 
 -- Убедитесь в наличии группы и файлов, а также в работоспособности группы (переключением). 
 -- Проследите последовательность SCN. 
+
 alter database add logfile 
     group 4 
     'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04.LOG'
@@ -133,7 +130,6 @@ alter database add logfile
     
 select * from V$LOG order by GROUP#;
 select * from V$LOGFILE order by GROUP#;
--- Переход будет кривым, смотрите на каждый шаг
 alter system switch logfile;
 select group#, status from V$LOG;
 select group# from V$LOG where status = 'CURRENT';
@@ -148,7 +144,7 @@ alter database drop logfile group 4;
 -- 14. Определите, выполняется или нет архивирование журналов повтора 
 -- (архивирование должно быть отключено, иначе дождитесь, пока другой студент выполнит задание и отключит).
 
--- Должны быть значения: LOG_MODE = NOARCHIVELOG; ARCHIVER = STOPPED
+
 select DBID, NAME, LOG_MODE from V$DATABASE;
 select INSTANCE_NAME, ARCHIVER, ACTIVE_STATE from V$INSTANCE;
 
@@ -169,9 +165,6 @@ select INSTANCE_NAME, ARCHIVER, ACTIVE_STATE from V$INSTANCE;
 -- Определите его местоположение и убедитесь в его наличии. 
 -- Проследите последовательность SCN в архивах и журналах повтора. 
 
--- Теперь тут должны появиться файлы архивации
--- (для их создания можно просто переключиться между 
--- журналами повтора и файлы автоматически создадутся)
 alter system switch logfile;
 select group# from V$LOG where status = 'CURRENT';
 select * from V$ARCHIVED_LOG;
@@ -191,9 +184,8 @@ select * from V$CONTROLFILE;
 
 -- 20. Получите и исследуйте содержимое управляющего файла. Поясните известные вам параметры в файле.
 
--- Путь C:\ORACLEDB\ORADATA\ORCL\CONTROL01.CTL, 
---      C:\ORACLEDB\ORADATA\ORCL\CONTROL02.CTL 
-show parameter control_files; -- в sqlplus, но можно и тут
+-- Путь C:\ORACLE\oradata\ORCL\CONTROLFILE\O1_MF_LMMZYXD6_.CTL
+show parameter control_files;
 select * from V$CONTROLFILE_RECORD_SECTION;
 
 -- 21. Определите местоположение файла параметров инстанса. Убедитесь в наличии этого файла.
