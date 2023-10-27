@@ -1,32 +1,43 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const xmlparser = require('express-xml-bodyparser');
 const path = require('path');
 const fs = require("fs");
+const xml2js = require("xml2js");
 
 const app = express();
 const port = 5000;
 
+app.use(xmlparser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Задание 01 /connection?set=set
+let keepAliveTimeout = null;
 app.get('/connection', (req, res) => {
     if (req.query.set) {
         const set_value = req.query.set;
+        keepAliveTimeout = set_value;
         // Здесь должен быть код, который устанавливает параметр KeepAliveTimeout
-        res.send(`Установлено новое значение параметра KeepAliveTimeout=${set_value}`);
+        res.send(`Установлено новое значение параметра KeepAliveTimeout=${keepAliveTimeout}`);
     } else {
         // Здесь должен быть код, который возвращает текущее значение параметра
-        res.send('Текущее значение параметра KeepAliveTimeout');
+        res.send(`Текущее значение параметра KeepAliveTimeout=${keepAliveTimeout}`);
     }
 });
 
 // Задание 02 /headers
 app.get('/headers', (req, res) => {
-    // Отображение заголовков запроса и ответа
+    // Отображение заголовков запроса
     const headers = req.headers;
-    res.json({ 'Заголовки запроса': headers });
+
+    for (const headerName in headers) {
+        const headerValue = headers[headerName];
+        res.write(`${headerName}: ${headerValue}\n`);
+    }
+
+    res.end();
 });
 
 // Задание 03 /parameter?x=x&y=y
@@ -77,16 +88,18 @@ app.get('/socket', (req, res) => {
 
 // Задание 06 resp-status?code=c&mess=m
 app.get('/resp-status', (req, res) => {
-    const code = req.query.code || 200;
-    const message = req.query.mess || 'OK';
+    const code = req.query.code || 404;
+    const message = req.query.mess || 'Not Found';
 
-    res.status(code).send(message);
+    // Отправляем ответ с заданным статусом и текстом статуса
+    res.statusCode = code;
+    res.statusMessage = message;
+    res.end();
+
 });
 
 // Задание 07 /formparameter
-
-// Отправляем HTML-страницу с формой
-app.get('/', (req, res) => {
+app.get('/formparameter', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 app.post('/formparameter', (req, res) => {
@@ -106,6 +119,7 @@ app.post('/formparameter', (req, res) => {
 });
 
 // Задание 08 /json
+// {"x": 5, "y": 3, "s": "Hello", "o": {"property1": " World", "property2": "!"}, "m": [1, 2, 3]}
 app.post('/json', (req, res) => {
     // Проверяем наличие данных в запросе
     if (!req.body || Object.keys(req.body).length === 0) {
@@ -132,24 +146,34 @@ app.post('/json', (req, res) => {
 });
 
 // Задание 09 /xml
+// <request id="29">
+//     <x>3</x>
+//     <x>4</x>
+//     <m>Hello</m>
+//     <m>World</m>
+// </request>
 app.post('/xml', (req, res) => {
-    // Парсим XML из тела запроса
-    xml2js.parseString(req.body, (err, result) => {
-        if (err) {
-            return res.status(400).send('Invalid XML format.');
-        }
+    // Парсим XML из req.body
+    const xmlData = req.body;
 
-        // Вычисляем значения для ответа
-        const xSum = result.message.x.reduce((sum, value) => sum + parseFloat(value), 0);
-        const mConcat = result.message.m.join('');
+    // Проверяем наличие необходимых элементов в объекте результата
+    if (!xmlData.request || !xmlData.request.$.id || !xmlData.request.x || !xmlData.request.m) {
+        return res.status(400).send('Invalid XML format: missing elements.');
+    }
 
-        // Формируем XML-ответ
-        const xmlResponse = `<response><sum result="${xSum}"/><concat result="${mConcat}"/></response>`;
+    // Получаем значение атрибута id
+    const requestId = xmlData.request.$.id;
 
-        // Отправляем ответ в XML-формате
-        res.type('application/xml');
-        res.send(xmlResponse);
-    });
+    // Вычисляем значения для ответа
+    const xSum = xmlData.request.x.reduce((sum, value) => sum + parseFloat(value), 0);
+    const mConcat = xmlData.request.m.join('');
+
+    // Формируем XML-ответ с использованием requestId
+    const xmlResponse = `<response id="${requestId}"><sum result="${xSum}"/><concat result="${mConcat}"/></response>`;
+
+    // Отправляем ответ в XML-формате
+    res.type('application/xml');
+    res.send(xmlResponse);
 });
 
 // Задание 10 /files
