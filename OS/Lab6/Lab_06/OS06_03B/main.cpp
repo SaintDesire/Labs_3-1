@@ -18,6 +18,7 @@ int main()
 		Sleep(100);
 	}
 
+	system("pause");
 	if (mutex)
 	{
 		CloseHandle(mutex);

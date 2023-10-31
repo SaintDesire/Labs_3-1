@@ -49,6 +49,5 @@ int main()
 
 	CloseHandle(mutex);
 	cout << '\n';
-	system("pause");
 	return 0;
 }
