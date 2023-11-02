@@ -13,10 +13,12 @@ int main()
 
 		else if (i == 60)
 			ReleaseMutex(mutex);
-
+			
 		printf("[OS06_03A]\t%d.  PID = %d\n", i, pid);
 		Sleep(100);
 	}
+
+	system("pause");
 
 	if (mutex)
 	{
