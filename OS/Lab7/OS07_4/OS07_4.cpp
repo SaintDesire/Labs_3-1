@@ -17,7 +17,6 @@ int main() {
         std::cerr << "Ошибка при создании одного из дочерних процессов." << std::endl;
         return 1;
     }
-    
 
     WaitForSingleObject(pi1.hProcess, INFINITE);
     WaitForSingleObject(pi2.hProcess, INFINITE);

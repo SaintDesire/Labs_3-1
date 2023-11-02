@@ -47,7 +47,7 @@ void generatePrimes(int duration, int processNumber) {
 }
 
 int main(int argc, char* argv[]) {
-    generatePrimes(5, 1);
+    generatePrimes(60, 1);
 
     return 0;
 }

@@ -13,7 +13,6 @@ int main()
 		printf("[OS06_05A]\t %d.  PID = %d\n", i, pid);
 		Sleep(100);
 	}
-	system("pause");
 
 	CloseHandle(event);
 }

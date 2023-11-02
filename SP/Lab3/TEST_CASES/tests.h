@@ -10,8 +10,4 @@ namespace tests
 	BOOL test2(ht::HtHandle* htHandle);
 	BOOL test3(ht::HtHandle* htHandle);
 	BOOL test4(ht::HtHandle* htHandle);
-	BOOL test5(ht::HtHandle* htHandle);
-	BOOL test6(ht::HtHandle* htHandle);
-	BOOL test7();
-
 }
