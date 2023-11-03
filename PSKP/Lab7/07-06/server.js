@@ -27,18 +27,6 @@ app.post('/', upload.single('file'), (req, res) => {
     }
 });
 
-// Пример отправки POST-запроса из сервера с использованием Axios
-app.get('/sendPostRequest', async (req, res) => {
-    try {
-        const response = await axios.post('http://localhost:5000', { data: 'example' });
-        console.log('Ответ от сервера:', response.data);
-        res.status(200).send('POST-запрос успешно отправлен из сервера');
-    } catch (error) {
-        console.error('Ошибка при отправке POST-запроса из сервера:', error.message);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
 app.listen(port, () => {
     console.log(`Сервер запущен на порту ${port}`);
 });

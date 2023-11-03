@@ -14,7 +14,7 @@ app.get('/getFile', (req, res) => {
 
         // Отправка файла как ответа на GET-запрос
         res.status(200)
-            .header('Content-Type', 'image/png')
+            .header('Content-Type', 'text/plain')
             .header('Content-Disposition', 'attachment; filename=downloadedFile.png')
             .send(fileData);
     } catch (error) {

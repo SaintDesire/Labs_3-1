@@ -30,10 +30,18 @@ app.get('/connection', (req, res) => {
 // Задание 02 /headers
 app.get('/headers', (req, res) => {
     // Отображение заголовков запроса
-    const headers = req.headers;
+    const requestHeaders = req.headers;
 
-    for (const headerName in headers) {
-        const headerValue = headers[headerName];
+    res.write('Request Headers:\n');
+    for (const headerName in requestHeaders) {
+        const headerValue = requestHeaders[headerName];
+        res.write(`${headerName}: ${headerValue}\n`);
+    }
+
+    res.write('\nResponse Headers:\n');
+    const responseHeaders = res.getHeaders();
+    for (const headerName in responseHeaders) {
+        const headerValue = responseHeaders[headerName];
         res.write(`${headerName}: ${headerValue}\n`);
     }
 
