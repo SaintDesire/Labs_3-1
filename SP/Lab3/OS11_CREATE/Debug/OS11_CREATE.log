@@ -1,0 +1,2 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1134,5): error MSB6006: "link.exe" завершилась с кодом 1112.
+Debug\OS11_CREATE.obj : fatal error LNK1112: тип компьютера модуля "x64" конфликтует с типом целевого компьютера "x86"

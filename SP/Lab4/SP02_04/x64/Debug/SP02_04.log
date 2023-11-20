@@ -1,0 +1,10 @@
+﻿  SP02_04.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab2\SP02_04\SP02_04.cpp(6,1): warning C4326: возвращаемый тип "main" должен быть "int", а не "void"
+SP02_04.obj : error LNK2019: ссылка на неразрешенный внешний символ "void * __cdecl SP02::Init(void)" (?Init@SP02@@YAPEAXXZ) в функции main.
+SP02_04.obj : error LNK2019: ссылка на неразрешенный внешний символ "double __cdecl SP02::Adder::Add(void *,double,double)" (?Add@Adder@SP02@@YANPEAXNN@Z) в функции main.
+SP02_04.obj : error LNK2019: ссылка на неразрешенный внешний символ "double __cdecl SP02::Adder::Sub(void *,double,double)" (?Sub@Adder@SP02@@YANPEAXNN@Z) в функции main.
+SP02_04.obj : error LNK2019: ссылка на неразрешенный внешний символ "double __cdecl SP02::Multiplier::Mul(void *,double,double)" (?Mul@Multiplier@SP02@@YANPEAXNN@Z) в функции main.
+SP02_04.obj : error LNK2019: ссылка на неразрешенный внешний символ "double __cdecl SP02::Multiplier::Div(void *,double,double)" (?Div@Multiplier@SP02@@YANPEAXNN@Z) в функции main.
+SP02_04.obj : error LNK2019: ссылка на неразрешенный внешний символ "void __cdecl SP02::Dispose(void *)" (?Dispose@SP02@@YAXPEAX@Z) в функции main.
+..\Debug\SP02_LIB.lib : warning LNK4272: тип компьютера библиотеки "x86" конфликтует с типом целевого компьютера "x64"
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab2\x64\Debug\SP02_04.exe : fatal error LNK1120: неразрешенных внешних элементов: 6

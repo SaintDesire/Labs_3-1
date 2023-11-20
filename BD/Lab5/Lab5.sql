@@ -59,37 +59,31 @@ drop table cachedTableLab5;
 -- (dedicated, shared).
     select username, service_name, server, osuser, machine, program, STATE
     from v$session
-    where username is not null;
+    where username is not null; 
 
 --ex12. Получите полный список работающих в настоящее время
 -- фоновых процессов.
     SELECT name, description FROM v$bgprocess;
 
 --ex13. Получите список работающих в настоящее время серверных процессов.
-    select * from v$process where addr != '00';
+    select program from v$process where addr != '00';
 
 --ex14. Определите, сколько процессов DBWn работает в настоящий момент.
     select count(*) from v$process where addr!= '00' and pname like 'DBW%';
 
 --ex15. Определите сервисы (точки подключения экземпляра).
-    select * from v$active_services;
-    --select * from v$services;
-
+    select name from v$active_services;
+    
 --ex16. Получите известные вам параметры диспетчеров.
     select * from v$dispatcher;
 
 --ex17. Укажите в списке Windows-сервисов сервис,
 -- реализующий процесс LISTENER.
     select * from v$services;
-    --services.msc->%listener%
 
 --ex18. Продемонстрируйте и поясните содержимое файла LISTENER.ORA.
-    --path: WINDOWS.x64...(this is db_home)/network/admin/listener.ora
-    --Screen: Screen_1.png
 
 --ex19. Запустите утилиту lsnrctl и поясните ее основные команды.
-    --Screen: screen_2
-    --commands:
     /*
         1. start - Запускает слушатель баз данных Oracle.
         2. servacls - Отображает список сервисов и их доступа для подключений через слушателя.
@@ -105,5 +99,3 @@ drop table cachedTableLab5;
     */
 
 --ex20. Получите список служб инстанса, обслуживаемых процессом LISTENER.
-    --Screen: Screen_3
-    --command: services
