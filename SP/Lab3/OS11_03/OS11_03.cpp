@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		{
 			Sleep(1000);
 
-			key = "key " + to_string(rand() % 50);
+			key = "k" + to_string(rand() % 50);
 			cout << "key: " << key << endl;
 
 			HT::Element* elFromHT = Get(HT, new Element(key.c_str(), (int)key.length() + 1));

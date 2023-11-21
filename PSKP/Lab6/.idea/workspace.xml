@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="81c56dff-bf5c-464f-a7de-a48f7fc6cb07" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../Условия/~$бораторная_работа_06.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Условия/~$бораторная_работа_07.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/06-00.js" beforeDir="false" afterPath="$PROJECT_DIR$/06-00.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Lab7/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Lab7/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Lab7/07-01/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Lab7/07-01/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Lab7/07-06/result/MyFile.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Lab7/07-06/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Lab7/07-06/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Lab7/07-07/result/HelloWorld.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Lab7/07-07/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Lab7/07-07/server.js" afterDir="false" />
-    </list>
+    <list default="true" id="81c56dff-bf5c-464f-a7de-a48f7fc6cb07" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -56,7 +44,7 @@
     "ignore.virus.scanning.warn.message": "true",
     "javascript.nodejs.core.library.configured.version": "20.5.1",
     "javascript.nodejs.core.library.typings.version": "20.5.1",
-    "last_opened_file_path": "C:/Users/Nikita/Desktop/Labs_3-1/PSKP/Lab7",
+    "last_opened_file_path": "C:/Users/Nikita/Desktop/Labs_3-1/TPO/Lab_9",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -87,6 +75,7 @@
       <workItem from="1698924727632" duration="527000" />
       <workItem from="1698925280668" duration="161000" />
       <workItem from="1698993327906" duration="2770000" />
+      <workItem from="1700543254289" duration="30000" />
     </task>
     <servers />
   </component>

@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		{
 			Sleep(1000);
 
-			key = "key " + to_string(rand() % 50);
+			key = "k" + to_string(rand() % 50);
 
 			HT::Element* element = new HT::Element(key.c_str(), (int)key.length() + 1, payload.c_str(), (int)payload.length() + 1);
 			Print(element);

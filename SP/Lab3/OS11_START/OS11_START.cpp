@@ -10,9 +10,12 @@ int main(int argc, char* argv[])	// ..//Files/newHT.ht
 {
 	setlocale(LC_ALL, "Rus");
 	HMODULE libModule = NULL;
+	typedef HTHANDLE* (*OpenFunc)(const wchar_t FileName[512]);
+	typedef BOOL (*SnapFunc)(HTHANDLE* ht);
+	typedef BOOL (*CloseFunc)(HTHANDLE* ht);
 	try
 	{
-		HMODULE libModule = LoadLibrary(L"OS11_HTAPI");
+		HMODULE libModule = LoadLibrary(L"./OS11_HTAPI");
 		if (!libModule)
 		{
 			throw "Невозможно загрузить библиотеку";
@@ -34,7 +37,7 @@ int main(int argc, char* argv[])	// ..//Files/newHT.ht
 			throw "Ошибка при получении адресов функций";
 		}
 
-		HTHANDLE* HT = Open(wc);
+		HTHANDLE* HT = openFunc(wc);
 		if (HT == NULL)
 		{
 			throw "Хранилище не создано";
@@ -49,11 +52,11 @@ int main(int argc, char* argv[])	// ..//Files/newHT.ht
 
 		while (true) {
 			Sleep((HT->SecSnapshotInterval) * 1000);
-			Snap(HT);
+			snapFunc(HT);
 			cout << "----SNAPSHOT in Thread----" << endl;
 		}
-		Snap(HT);
-		Close(HT);
+		snapFunc(HT);
+		closeFunc(HT);
 		FreeLibrary(libModule);
 	}
 	catch (const char* err)
