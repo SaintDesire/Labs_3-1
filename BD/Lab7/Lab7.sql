@@ -5,29 +5,30 @@
 -- Рабочий способ (и правильный): 
 -- Делаем коннект от SYS к PDB и там создаем юзера
 
-alter pluggable database TDS_PDB open;
+alter pluggable database KNI_PDB open;
+alter session set container = KNI_PDB;
 -- Смотрим к чему мы подключены
 show con_name;
 
-create tablespace TS_TDS
-  DATAFILE 'TS_TDS_LAB7_PDB.dbf'
+create tablespace TS_KNI
+  DATAFILE 'TS_KNI_LAB7_PDB.dbf'
   size 7M
   autoextend ON
   next 5M
   maxsize 20M;
 
-create temporary tablespace TS_TDS_TEMP
-  tempfile 'TS_TDS_TEMP_LAB7_PDB.dbf'
+create temporary tablespace TS_KNI_TEMP
+  tempfile 'TS_KNI_TEMP_LAB7_PDB.dbf'
   size 5M
   autoextend ON
   next 3M
   maxsize 30M;
 
 select TABLESPACE_NAME, STATUS, contents logging from SYS.DBA_TABLESPACES;
-drop tablespace TS_TDS including contents and datafiles;
-drop tablespace TS_TDS_TEMP including contents and datafiles;
+drop tablespace TS_KNI including contents and datafiles;
+drop tablespace TS_KNI_TEMP including contents and datafiles;
 
-CREATE PROFILE PF_TDS LIMIT
+CREATE PROFILE PF_KNI LIMIT
   FAILED_LOGIN_ATTEMPTS 7
   SESSIONS_PER_USER 3
   PASSWORD_LIFE_TIME 60
@@ -35,33 +36,33 @@ CREATE PROFILE PF_TDS LIMIT
   PASSWORD_LOCK_TIME 1
   CONNECT_TIME 180;
 
-select * from DBA_PROFILES where profile = 'PF_TDS';
-drop profile PF_TDS;
+select * from DBA_PROFILES where profile = 'PF_KNI';
+drop profile PF_KNI;
 
 
-CREATE USER TDS identified by 111
-  DEFAULT TABLESPACE TS_TDS
-  TEMPORARY TABLESPACE TS_TDS_TEMP
-  PROFILE PF_TDS
+CREATE USER KNI identified by 111
+  DEFAULT TABLESPACE TS_KNI
+  TEMPORARY TABLESPACE TS_KNI_TEMP
+  PROFILE PF_KNI
   ACCOUNT UNLOCK;
 
-select * from dba_users where USERNAME like 'TDS';
-drop user TDS;
+select * from dba_users where USERNAME like 'KNI';
+drop user KNI;
 
 -- !!! Роли в PDB не работают, поэтому грант делаем сами (тут вроде все, 
 -- что нужно, если чего то нет, добавляйте по ходу)
-GRANT CREATE SESSION TO TDS;
-GRANT RESTRICTED SESSION TO TDS;
-GRANT CREATE ANY TABLE TO TDS;
-GRANT CREATE ANY VIEW TO TDS;
-GRANT CREATE SEQUENCE TO TDS;
-GRANT UNLIMITED TABLESPACE TO TDS;
-GRANT CREATE CLUSTER TO TDS;
-GRANT CREATE SYNONYM TO TDS;
-GRANT CREATE PUBLIC SYNONYM TO TDS;
-GRANT CREATE MATERIALIZED VIEW TO TDS;
+GRANT CREATE SESSION TO KNI;
+GRANT RESTRICTED SESSION TO KNI;
+GRANT CREATE ANY TABLE TO KNI;
+GRANT CREATE ANY VIEW TO KNI;
+GRANT CREATE SEQUENCE TO KNI;
+GRANT UNLIMITED TABLESPACE TO KNI;
+GRANT CREATE CLUSTER TO KNI;
+GRANT CREATE SYNONYM TO KNI;
+GRANT CREATE PUBLIC SYNONYM TO KNI;
+GRANT CREATE MATERIALIZED VIEW TO KNI;
 
-select * from USER_SYS_PRIVS where username = 'TDS';
+select * from USER_SYS_PRIVS where username = 'KNI';
 
 -- 1. Прочитайте задание полностью и выдайте своему пользователю необходимые права.
 
@@ -146,7 +147,7 @@ select S4.NEXTVAL from DUAL;
 
 -- 7. Получите список всех последовательностей в словаре базы данных, 
 -- владельцем которых является пользователь XXX.
-SELECT * FROM ALL_SEQUENCES WHERE SEQUENCE_OWNER = 'TDS';
+SELECT * FROM ALL_SEQUENCES WHERE SEQUENCE_OWNER = 'KNI';
 DROP SEQUENCE S1;
 DROP SEQUENCE S2;
 DROP SEQUENCE S3;
@@ -162,7 +163,7 @@ CREATE TABLE T1 (
   N2 NUMBER(20),
   N3 NUMBER(20),
   N4 NUMBER(20)
-) CACHE STORAGE ( BUFFER_POOL KEEP ) tablespace TS_TDS;
+) CACHE STORAGE ( BUFFER_POOL KEEP ) tablespace TS_KNI;
 
 BEGIN
   FOR i IN 1..7 LOOP
@@ -213,12 +214,12 @@ SELECT TABLE_NAME FROM USER_TABLES;
 SELECT CLUSTER_NAME FROM USER_CLUSTERS;
 
 -- 14. Создайте частный синоним для таблицы XXX.С и продемонстрируйте его применение.
-CREATE SYNONYM SC FOR TDS.C;
+CREATE SYNONYM SC FOR KNI.C;
 SELECT * FROM C;
 SELECT * FROM SC;
 
 -- 15. Создайте публичный синоним для таблицы XXX.B и продемонстрируйте его применение.
-CREATE PUBLIC SYNONYM SB FOR TDS.B;
+CREATE PUBLIC SYNONYM SB FOR KNI.B;
 SELECT * FROM SB;
 
 
