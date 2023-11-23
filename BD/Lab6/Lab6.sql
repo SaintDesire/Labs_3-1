@@ -8,11 +8,12 @@ grant
     drop any table,
     SYSDBA
 to C##KNI container = all;
+
  
-create table Test (id number);
-insert into Test values (1);
-insert into Test values (2);
-insert into Test values (3);
+create table x (id number);
+insert into x values (1);
+insert into x values (2);
+insert into x values (3);
     
 
 -- 10
