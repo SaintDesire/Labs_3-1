@@ -7,11 +7,14 @@ wsServer.on('connection', (ws) => {
         console.log('08-03 server received message:', message.toString());
 
         // Отправляем сообщение всем клиентам
-        wss.clients.forEach((client) => {
+        wsServer.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(message);
             }
         });
+    });
+    ws.on('close', function() {
+        console.log('Server closed connection');
     });
 });
 

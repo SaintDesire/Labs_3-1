@@ -19,6 +19,10 @@ app.get('/start', (req, res) => {
               document.getElementById('messages').innerHTML += message + '<br>';
             };
 
+            setTimeout(() => {
+                ws.close();
+            }, 25000);
+            
             let count = 1;
             const interval = setInterval(() => {
               const message = '08-01-client: ' + count;
@@ -27,7 +31,6 @@ app.get('/start', (req, res) => {
 
               if (count > 25) {
                 clearInterval(interval);
-                ws.close();
               }
             }, 3000);
           }

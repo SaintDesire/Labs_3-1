@@ -1,8 +1,8 @@
 const WebSocket = require('ws');
 
-const wsServer = new WebSocket('ws://localhost:5000');
+const ws = new WebSocket('ws://localhost:5000');
 
-wsServer.onopen = function() {
+ws.onopen = function() {
     let count = 1;
     const interval = setInterval(() => {
         const message = '08-03_1-client: ' + count;
