@@ -2,12 +2,8 @@
 -- пользователя XXX (у каждого студента собственный пользователь и инфраструктура) 
 -- в своей PDB.
 
--- Рабочий способ (и правильный): 
--- Делаем коннект от SYS к PDB и там создаем юзера
-
 alter pluggable database KNI_PDB open;
 alter session set container = KNI_PDB;
--- Смотрим к чему мы подключены
 show con_name;
 
 create tablespace TS_KNI
@@ -49,8 +45,7 @@ CREATE USER KNI identified by 111
 select * from dba_users where USERNAME like 'KNI';
 drop user KNI;
 
--- !!! Роли в PDB не работают, поэтому грант делаем сами (тут вроде все, 
--- что нужно, если чего то нет, добавляйте по ходу)
+-- 1. Прочитайте задание полностью и выдайте своему пользователю необходимые права.
 GRANT CREATE SESSION TO KNI;
 GRANT RESTRICTED SESSION TO KNI;
 GRANT CREATE ANY TABLE TO KNI;
@@ -64,10 +59,7 @@ GRANT CREATE MATERIALIZED VIEW TO KNI;
 
 select * from USER_SYS_PRIVS where username = 'KNI';
 
--- 1. Прочитайте задание полностью и выдайте своему пользователю необходимые права.
 
--- По факту, создаем коннект с юзером, которого мы создали выше
--- Если не помним как делать коннект, welcome to Lab3
 
 -- 2. Создайте последовательность S1 (SEQUENCE), со следующими характеристиками: 
 -- начальное значение 1000; 
@@ -165,13 +157,23 @@ CREATE TABLE T1 (
   N4 NUMBER(20)
 ) CACHE STORAGE ( BUFFER_POOL KEEP ) tablespace TS_KNI;
 
+
+alter sequence s1 restart;
+
+alter sequence s2 restart;
+
+alter sequence s3 restart;
+
+alter sequence s4 restart;
 BEGIN
-  FOR i IN 1..7 LOOP
+  FOR i IN 1..7 LOOP    
     INSERT INTO T1 VALUES (S1.NEXTVAL, S2.NEXTVAL, S3.NEXTVAL, S4.NEXTVAL);
   END LOOP;
 END;
 
 SELECT * FROM T1;
+
+DROP TABLE T1;
 
 
 -- 9. Создайте кластер ABC, имеющий hash-тип (размер 200) и 
@@ -217,6 +219,7 @@ SELECT CLUSTER_NAME FROM USER_CLUSTERS;
 CREATE SYNONYM SC FOR KNI.C;
 SELECT * FROM C;
 SELECT * FROM SC;
+drop synonym SC;
 
 -- 15. Создайте публичный синоним для таблицы XXX.B и продемонстрируйте его применение.
 CREATE PUBLIC SYNONYM SB FOR KNI.B;
@@ -261,5 +264,7 @@ CREATE MATERIALIZED VIEW MV
     inner join
     B16
     on A16.XA = B16.XB;
+
+drop materialized view MV;
 
 select * from MV;
