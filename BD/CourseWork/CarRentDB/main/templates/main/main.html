@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test</title>
+</head>
+<body>
+{% for car in cars %}
+  <div class="car">
+    <h3>{{ car.brand }}</h3>
+    <p>Model: {{ car.model }}</p>
+    <p>Color: {{ car.color }}</p>
+    <p>Year: {{ car.year }}</p>
+    <p>Status: {{ car.status }}</p>
+  </div>
+{% endfor %}
+</body>
+</html>
