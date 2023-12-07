@@ -1,9 +1,0 @@
-﻿  pch.cpp
-  dllmain.cpp
-  MathFactory.cpp
-  Registry.cpp
-C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab2\SP02_COM\Registry.cpp(77,24): warning C4267: аргумент: преобразование из "size_t" в "DWORD"; возможна потеря данных
-  SP02.cpp
-  Создание кода...
-     Создается библиотека C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab2\x64\Debug\SP02_COM.lib и объект C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab2\x64\Debug\SP02_COM.exp
-  SP02_COM.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab2\x64\Debug\SP02_COM.dll

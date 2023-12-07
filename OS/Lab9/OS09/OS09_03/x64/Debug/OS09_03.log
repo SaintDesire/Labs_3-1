@@ -1,0 +1,5 @@
+﻿  Main.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab9\OS09\OS09_03\Main.cpp(85,21): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab9\OS09\OS09_03\Main.cpp(91,26): warning C4244: =: преобразование "WCHAR" в "char", возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab9\OS09\OS09_03\Main.cpp(118,26): warning C4244: =: преобразование "WCHAR" в "char", возможна потеря данных
+  OS09_03.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\OS\Lab9\OS09\x64\Debug\OS09_03.exe

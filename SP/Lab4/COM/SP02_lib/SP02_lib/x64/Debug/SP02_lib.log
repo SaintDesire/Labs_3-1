@@ -1,0 +1,8 @@
+﻿  pch.cpp
+  SP02_lib.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab4\COM\SP02_lib\SP02_lib\SP02_lib.cpp(97): warning C4715: SP2::Multiplier::Div: значение возвращается не при всех путях выполнения
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab4\COM\SP02_lib\SP02_lib\SP02_lib.cpp(78): warning C4715: SP2::Multiplier::Mul: значение возвращается не при всех путях выполнения
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab4\COM\SP02_lib\SP02_lib\SP02_lib.cpp(46): warning C4715: SP2::Adder::Add: значение возвращается не при всех путях выполнения
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab4\COM\SP02_lib\SP02_lib\SP02_lib.cpp(62): warning C4715: SP2::Adder::Sub: значение возвращается не при всех путях выполнения
+  SP02_lib.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab4\COM\SP02_lib\x64\Debug\SP02_lib.lib
+  Скопировано файлов: 0.

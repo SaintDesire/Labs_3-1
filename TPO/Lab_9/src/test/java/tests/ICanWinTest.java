@@ -20,9 +20,9 @@ public class ICanWinTest {
     public void tryNewPateCreated() {
         ICanWinTestPage iCanWinTestPage = new ICanWinTestPage(driver);
         iCanWinTestPage.openPage();
-        iCanWinTestPage.writeNewText("Artsiom");
-        iCanWinTestPage.chooseExpiration("1 Day");
-        iCanWinTestPage.writeName("Artsy");
+        iCanWinTestPage.writeNewText("Hello from WebDriver");
+        iCanWinTestPage.chooseExpiration("10 Minutes");
+        iCanWinTestPage.writeName("helloweb");
         String oldUrl = driver.getCurrentUrl();
         iCanWinTestPage.clickCreateNewPasteButton();
         Assert.assertNotEquals(oldUrl, driver.getCurrentUrl());

@@ -2,6 +2,7 @@ package tests;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterMethod;
@@ -25,22 +26,21 @@ public class WebSiteTest {
     public void addToFavouriteTest() {
         driver.get("https://7745.by");
 
-        WebElement inputField = driver.findElement(By.className("ui-autocomplete-input"));
-        inputField.sendKeys("rtx 4070");
+        WebElement inputField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ui-autocomplete-input")));
+        inputField.sendKeys("iphone");
 
         WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(By.className("btn-search")));
         searchButton.click();
 
-        WebElement buyButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".action-btn--favourites[data-articul='876821']")));
-
-        // Прокрутка страницы до элемента
+        WebElement buyButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".action-btn--favourites[data-articul='862193']")));
+        Actions actions = new Actions(driver);
+        actions.moveToElement(buyButton).build().perform();
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", buyButton);
-        // Ожидание, чтобы убедиться, что элемент становится видимым
-        wait.until(ExpectedConditions.visibilityOf(buyButton));
+
 
         buyButton.click();
 
-        WebElement productLink = wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Видеокарта MSI RTX 4070 GAMING X SLIM WHITE 12G (RTX 4070 GAMING X SLIM WHITE 12G)")));
+        WebElement productLink = wait.until(ExpectedConditions.elementToBeClickable(By.partialLinkText("iPhone 14 Plus 128GB Blue")));
         productLink.click();
 
         WebElement addedButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".cursor-pointer.action-btn--favourites-added")));

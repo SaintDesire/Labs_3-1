@@ -3,6 +3,7 @@ package tests;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -42,8 +43,9 @@ public class HardcoreTest {
 
     @BeforeMethod
     public void driverSetup() {
-
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--load-extension=C:\\Users\\Nikita\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\gighmmpiobklfepjocnamgkkbiglidom\\5.15.0_0");
+        driver = new ChromeDriver(options);
         HardcorePage hardcorePage = new HardcorePage(driver);
         hardcorePage.openPage();
         calculatorPage = hardcorePage.startSearch("Google Cloud Pricing Calculator").goToResult("Google Cloud Pricing Calculator");

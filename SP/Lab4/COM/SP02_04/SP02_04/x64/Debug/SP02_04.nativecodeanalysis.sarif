@@ -1,0 +1,59 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "results": [],
+      "tool": {
+        "driver": {
+          "name": "PREfast",
+          "fullName": "PREfast Code Analysis",
+          "version": "14.37.32822.0",
+          "informationUri": "https://aka.ms/cpp/ca"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///c:/users/nikita/desktop/labs_3-1/sp/lab4/com/sp02_04/sp02_04/sp02_04.cpp"
+          },
+          "roles": [
+            "analysisTarget"
+          ],
+          "hashes": {
+            "sha-256": "02bf4f11f6671d9262e0bd69a180e315decf0fe40f3c09456980591ba8b7f526"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/nikita/desktop/labs_3-1/sp/lab4/com/sp02_lib/sp02_lib/sp02_lib.h"
+          },
+          "hashes": {
+            "sha-256": "0737e118640a13ba3c93d65f011b4de0a93276f5fb9cbf78dee320e8cb39bd88"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/nikita/desktop/labs_3-1/sp/lab4/com/sp02_com/sp02_com/interface.h"
+          },
+          "hashes": {
+            "sha-256": "c5e665d4a5a20b0f8273d70b9089d48d2fc26b22e0d262cb3397cca56877d7ae"
+          }
+        },
+        {
+          "location": {
+            "uri": "file:///c:/users/nikita/desktop/labs_3-1/sp/lab4/com/sp02_com/sp02_com/com.h"
+          },
+          "hashes": {
+            "sha-256": "3f84ec6bbcd229b88f4db0584a1fb2476ec6e0b859005863db22842732d5bc53"
+          }
+        }
+      ]
+    }
+  ]
+}

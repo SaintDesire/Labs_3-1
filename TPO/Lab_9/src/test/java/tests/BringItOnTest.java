@@ -28,6 +28,7 @@ public class BringItOnTest {
         bringItOnPage.chooseExpiration(PASTE_EXPIRATION);
         bringItOnPage.writeName(PASTE_NAME);
         savedPastePage = bringItOnPage.clickCreateNewPasteButton();
+
     }
 
     @Test

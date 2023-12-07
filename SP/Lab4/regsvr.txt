@@ -1,0 +1,1 @@
+[admin console] : regsvr32 /i:xxxx [name of dll]

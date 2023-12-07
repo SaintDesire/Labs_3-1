@@ -1,0 +1,6 @@
+﻿  Main.cpp
+D:\studing\5_semestr\operation_systems\labs\lab_9\OS09\OS09_04\Main.cpp(56,71): warning C4244: инициализация: преобразование "LONGLONG" в "unsigned int", возможна потеря данных
+D:\studing\5_semestr\operation_systems\labs\lab_9\OS09\OS09_04\Main.cpp(57,25): warning C4244: аргумент: преобразование "LONGLONG" в "size_t", возможна потеря данных
+D:\studing\5_semestr\operation_systems\labs\lab_9\OS09\OS09_04\Main.cpp(59,55): warning C4244: аргумент: преобразование "LONGLONG" в "DWORD", возможна потеря данных
+D:\studing\5_semestr\operation_systems\labs\lab_9\OS09\OS09_04\Main.cpp(74,25): warning C4018: >: несоответствие типов со знаком и без знака
+  OS09_04.vcxproj -> D:\studing\5_semestr\operation_systems\labs\lab_9\OS09\Debug\OS09_04.exe
