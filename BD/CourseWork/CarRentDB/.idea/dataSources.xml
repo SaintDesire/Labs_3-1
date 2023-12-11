@@ -16,5 +16,12 @@
       <jdbc-url>jdbc:sqlserver://localhost:1433;database=CarRentDB</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="CarRentDB@localhost" uuid="4e3cfe66-36d0-438c-8599-3b40196a9106">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/CarRentDB</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

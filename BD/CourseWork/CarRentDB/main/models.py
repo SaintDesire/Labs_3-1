@@ -1,69 +1,50 @@
-from django.db import models
-
+from django.contrib.gis.db import models
 
 class Location(models.Model):
     location_id = models.AutoField(primary_key=True)
     address = models.CharField(max_length=100)
-    geom = models.CharField(max_length=50)
-
-    class Meta:
-        managed = False
-        db_table = 'locations'
-
+    geom = models.PointField(srid=4326, default=None)
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
-    brand = models.CharField(max_length=50)
-    model = models.CharField(max_length=50)
-    color = models.CharField(max_length=20)
+    brand = models.CharField(max_length=50, default=None)
+    model = models.CharField(max_length=50, default=None)
+    color = models.CharField(max_length=20, default=None)
     year = models.IntegerField()
-    status = models.CharField(max_length=20)
-    number = models.CharField(max_length=20)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
-
-    class Meta:
-        managed = False
-        db_table = 'cars'
-
+    status = models.CharField(max_length=20, default=None)
+    number = models.CharField(max_length=20, default='Unknown')
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, default=None)
 
 class User(models.Model):
+    ROLES = (
+        ('user', 'User'),
+        ('admin', 'Admin'),
+    )
     user_id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.CharField(max_length=100)
-    phone = models.CharField(max_length=20)
-    address = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=50, default=None)
+    last_name = models.CharField(max_length=50, default=None)
+    email = models.CharField(max_length=100, default=None)
+    phone = models.CharField(max_length=20, default=None)
+    address = models.CharField(max_length=100, default=None)
+    password = models.CharField(max_length=128, default=None)
+    role = models.CharField(max_length=50, choices=ROLES, default='user')
 
-    class Meta:
-        managed = False
-        db_table = 'users'
-
+    def is_admin(self):
+        return self.role == 'admin'
 
 class Rental(models.Model):
     rental_id = models.AutoField(primary_key=True)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, default=None)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     start_date = models.DateField()
     end_date = models.DateField()
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
-    class Meta:
-        managed = False
-        db_table = 'rentals'
 
-
-class Graph(models.Model):
-    graph_id = models.AutoField(primary_key=True)
-    graph_name = models.CharField(max_length=50)
-    graph_data = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'graphs'
 
 
 carsDictionary = {
-    "bmw": {
+    "BMW": {
         "models": {
             "X5": {
                 "year": 2020,
@@ -73,7 +54,7 @@ carsDictionary = {
             }
         }
     },
-    "toyota": {
+    "Toyota": {
         "models": {
             "Camry": {
                 "year": 2020,
@@ -83,7 +64,7 @@ carsDictionary = {
             }
         }
     },
-    "honda": {
+    "Honda": {
         "models": {
             "Civic": {
                 "year": 2021,
@@ -93,7 +74,7 @@ carsDictionary = {
             }
         }
     },
-    "audi": {
+    "Audi": {
         "models": {
             "A3": {
                 "year": 2019,
@@ -103,7 +84,7 @@ carsDictionary = {
             }
         }
     },
-    "mercedes": {
+    "Mercedes": {
         "models": {
             "C-Class": {
                 "year": 2021,
@@ -113,7 +94,7 @@ carsDictionary = {
             }
         }
     },
-    "volkswagen": {
+    "Volkswagen": {
         "models": {
             "Golf": {
                 "year": 2021,
@@ -123,7 +104,7 @@ carsDictionary = {
             }
         }
     },
-    "ford": {
+    "Ford": {
         "models": {
             "Focus": {
                 "year": 2021,
@@ -133,7 +114,7 @@ carsDictionary = {
             }
         }
     },
-    "chevrolet": {
+    "Chevrolet": {
         "models": {
             "Cruze": {
                 "year": 2020,
@@ -143,7 +124,7 @@ carsDictionary = {
             }
         }
     },
-    "nissan": {
+    "Nissan": {
         "models": {
             "Sentra": {
                 "year": 2021,
@@ -153,7 +134,7 @@ carsDictionary = {
             }
         }
     },
-    "subaru": {
+    "Subaru": {
         "models": {
             "Impreza": {
                 "year": 2021,
