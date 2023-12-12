@@ -20,7 +20,8 @@ public class HomePage {
     private WebElement searchButton;
     @FindBy(xpath = "(//input[@id='recall-name'])[2]")
     private WebElement recallNameField;
-
+    @FindBy(xpath = "//button[contains(@class, 'js-accept-cookies')]")
+    private WebElement cookiesButton;
     @FindBy(xpath = "(//select[@id='recall-phone-country'])[2]")
     private WebElement prefixSelect;
 
@@ -60,16 +61,21 @@ public class HomePage {
     public void acceptPolicy() {
         acceptedPolicyCheckbox.click();
     }
-    public void submitButtonClick() throws InterruptedException {
-        submitButton.click();
-        Thread.sleep(2000);
-        driver.switchTo().frame(driver.findElement(By.cssSelector("iframe[title='reCAPTCHA']")));
-        WebElement captchaCheckbox = driver.findElement(By.xpath("//span[@id='recaptcha-anchor']/div[@class='recaptcha-checkbox-border']"));
-        captchaCheckbox.click();
-        driver.switchTo().defaultContent();
-        Thread.sleep(2000);
-        submitButton.click();
-    }
+        public void submitButtonClick() throws InterruptedException {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+
+            WebElement submitButtonElement = wait.until(ExpectedConditions.visibilityOf(submitButton));
+            js.executeScript("arguments[0].scrollIntoViewIfNeeded();", submitButtonElement);
+            Actions actions = new Actions(driver);
+            actions.moveToElement(submitButtonElement).click().perform();
+            Thread.sleep(2000);
+            driver.switchTo().frame(driver.findElement(By.cssSelector("iframe[title='reCAPTCHA']")));
+            WebElement captchaCheckbox = driver.findElement(By.xpath("//span[@id='recaptcha-anchor']/div[@class='recaptcha-checkbox-border']"));
+            captchaCheckbox.click();
+            driver.switchTo().defaultContent();
+            Thread.sleep(2000);
+            submitButton.click();
+        }
     public boolean isRequestAccepted() {
         WebElement messageElement = driver.findElement(By.xpath("//div[contains(text(), 'Ваш запрос принят в обработку!')]"));
         return messageElement.isDisplayed();
@@ -91,12 +97,14 @@ public class HomePage {
 
     public void clickCallOrderButton() {
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
 
-        // Находим кнопку и нажимаем на нее
-        WebElement callOrderButtonElement = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".call-order.open-popup.d-flex")));
-        js.executeScript("arguments[0].scrollIntoView();", callOrderButtonElement);
+        WebElement callOrderButtonElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".call-order.open-popup.d-flex")));
+        js.executeScript("arguments[0].scrollIntoViewIfNeeded();", callOrderButtonElement);
+
+        callOrderButtonElement = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".call-order.open-popup.d-flex")));
         callOrderButtonElement.click();
+
+        cookiesButton.click();
     }
 
 }
