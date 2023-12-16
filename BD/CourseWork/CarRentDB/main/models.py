@@ -1,9 +1,18 @@
+from datetime import timezone, date, timedelta
+
+from django.contrib.auth.models import User
 from django.contrib.gis.db import models
+from django.core.validators import MinValueValidator
+
+
 
 class Location(models.Model):
     location_id = models.AutoField(primary_key=True)
     address = models.CharField(max_length=100)
     geom = models.PointField(srid=4326, default=None)
+
+    def __str__(self):
+        return self.address
 
 class Car(models.Model):
     car_id = models.AutoField(primary_key=True)
@@ -14,6 +23,7 @@ class Car(models.Model):
     status = models.CharField(max_length=20, default=None)
     number = models.CharField(max_length=20, default='Unknown')
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, default=None)
+    is_free = models.BooleanField(default=True)
 
 class User(models.Model):
     ROLES = (
@@ -25,12 +35,17 @@ class User(models.Model):
     last_name = models.CharField(max_length=50, default=None)
     email = models.CharField(max_length=100, default=None)
     phone = models.CharField(max_length=20, default=None)
-    address = models.CharField(max_length=100, default=None)
+    address = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, default=None)
     password = models.CharField(max_length=128, default=None)
     role = models.CharField(max_length=50, choices=ROLES, default='user')
+    ban_end_date = models.DateField(null=True, blank=True, validators=[MinValueValidator(limit_value=date.today() + timedelta(days=1))])
 
     def is_admin(self):
         return self.role == 'admin'
+
+    def is_banned(self):
+        return self.ban_end_date is not None and self.ban_end_date >= timezone.now().date()
+
 
 class Rental(models.Model):
     rental_id = models.AutoField(primary_key=True)

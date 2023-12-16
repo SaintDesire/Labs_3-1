@@ -1,13 +1,15 @@
 import random, os, requests, xml.etree.ElementTree as ET, string,re
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.hashers import make_password
+from datetime import date, timedelta
+from django.contrib.auth import logout, login, authenticate
 from django.contrib.gis.geos import Point
 from django.db import connection
-from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User as AuthUser
 from main.models import Car, carsDictionary, Location, User, Rental
 from faker import Faker
+from django.contrib.auth.models import User as Admin
 
 colors = ["Red", "Blue", "Green", "Yellow", "Black", "White"]
 status_options = ["Less than 2 years", "2-5 years", "More than 5 years"]
@@ -26,25 +28,30 @@ current_user = {
 def index(request):
     locations = Location.objects.all()
     cars = Car.objects.all()
-
     car_data = []
-    i = 0
+    user_coordinates = {}
+
+    for location in locations:
+        if current_user['address'] is not None and location.address is not None:
+            if str(location.address) == str(current_user['address']):
+                user_coordinates = {
+                    'longitude': location.geom.x,
+                    'latitude': location.geom.y,
+                }
+                break
+
     for car in cars:
         car_location = car.location.location_id
 
-        print(car.location.location_id)
         car_coordinates = None
-
         for location in locations:
 
+
             if location.location_id == car_location:
-                i += 1
                 car_coordinates = {
                     'longitude': location.geom.x,
                     'latitude': location.geom.y,
                 }
-                print(car_coordinates["longitude"])
-                print(car_coordinates["latitude"])
                 break
 
         # Создаем словарь с данными о машине и ее координатах
@@ -55,9 +62,10 @@ def index(request):
 
     data = {
         'car_data': car_data,
-        'current_user': current_user
+        'current_user': current_user,
+        'user_coordinates': user_coordinates
     }
-    print(i)
+
     return render(request, 'main/main.html', data)
 def login(request):
     if request.method == 'POST':
@@ -74,18 +82,6 @@ def login(request):
                 current_user["phone"] = user.phone
                 current_user["address"] = user.address
                 current_user["password"] = password
-                if user.is_admin():
-                    print("admin")
-                    superuser = AuthUser.objects.create_superuser(
-                        username=user.email,
-                        password=user.password
-                    )
-
-                    # Установка роли "admin" для суперпользователя
-                    superuser.is_staff = True
-                    superuser.is_superuser = True
-                    superuser.save()
-
                 return redirect('home')
             elif not email_valid:
                 error_message = 'Введите корректный адрес электронной почты'
@@ -118,26 +114,26 @@ def signup(request):
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         phone_number = request.POST['phone_number']
-        address = request.POST['address']
+        address_id = request.POST['address']
         user = {
             'email': email,
             'password': password,
             'first_name': first_name,
             'last_name': last_name,
             'phone_number': phone_number,
-            'address': address
+            'address_id': address_id,
+            'locations': locations
         }
-        # Проверка, существует ли пользователь с заданным email
         try:
             existing_user = User.objects.get(email=email)
             messages.error(request, 'Пользователь с таким email уже существует.')
             return render(request, 'main/signup.html', user)
         except User.DoesNotExist:
-            location = Location.objects.filter(address=address).first()
+            location = get_object_or_404(Location, address=address_id)
             email_validate = validate_email(email)
             if location and email_validate:
                 user = User(email=email, password=encrypt_decrypt_password(password, key), first_name=first_name,
-                            last_name=last_name, phone=phone_number, address=address)
+                            last_name=last_name, phone=phone_number, address=location)
                 user.save()
                 current_user["user_id"] = user.user_id
                 current_user["first_name"] = user.first_name
@@ -151,7 +147,6 @@ def signup(request):
                 messages.error(request, 'Введите корректный адрес электронной почты')
                 return render(request, 'main/signup.html', user)
             else:
-                # Адрес не существует в модели Location, выполните нужные действия (например, отобразить сообщение об ошибке)
                 messages.error(request, 'Введенный адрес не существует.')
                 return render(request, 'main/signup.html', user)
     else:
@@ -159,15 +154,119 @@ def signup(request):
         return render(request, 'main/signup.html', {'locations': locations})
 def account(request):
     user_id = current_user["user_id"]
+    locations = Location.objects.all()
     rental_count = 0
 
-    rentals = Rental.objects.filter(user=current_user["user_id"])
+    rentals = Rental.objects.filter(user=user_id)
+    user = User.objects.get(user_id=user_id)
+    print(user.role)
     data = {
         'current_user': current_user,
         'rentals': rentals,
-        'rental_count': rental_count
+        'rental_count': rental_count,
+        'locations': locations,
+        'user' : user
     }
     return render(request, 'main/account.html', data)
+def update_account(request):
+    data = {}
+    locations = Location.objects.all()
+    if request.method == 'POST':
+        error_message = ''
+
+        try:
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            email = request.POST['email']
+            phone_number = request.POST['phone_number']
+            address_id = request.POST['address']
+            location = get_object_or_404(Location, address=address_id)
+            user = {
+                'email': email,
+                'first_name': first_name,
+                'last_name': last_name,
+                'phone_number': phone_number,
+                'address_id': address_id,
+            }
+            try:
+                data['old_password'] = request.POST['oldPassword']
+                data['new_password'] = request.POST['newPassword']
+            except KeyError:
+                data['old_password'] = None
+                data['new_password'] = None
+
+            user_obj = User.objects.get(email=user['email'])
+
+            if user['first_name'] != user_obj.first_name:
+                user_obj.first_name = user['first_name']
+            if user['last_name'] != user_obj.last_name:
+                user_obj.last_name = user['last_name']
+            if user['phone_number'] != user_obj.phone:
+                user_obj.phone = user['phone_number']
+            if user['address_id'] != user_obj.address:
+                user_obj.address = location
+            if data['old_password'] is not '' and data['new_password'] is not '':
+                try:
+                    enc_password = encrypt_decrypt_password(data['old_password'], 15)
+                    if enc_password == user_obj.password:
+                        user_obj.password = encrypt_decrypt_password(data['new_password'], 15)
+                        error_message = 'Данные обновлены.'
+                    else:
+                        error_message = 'Старый пароль введен неправильно.'
+                except Exception:
+                    error_message = 'Ошибка при шифровании пароля.'
+            user_obj.save()
+            current_user["user_id"] = current_user["user_id"]
+            current_user["first_name"] = user_obj.first_name
+            current_user["last_name"] = user_obj.last_name
+            current_user["email"] = user_obj.email
+            current_user["phone"] = user_obj.phone
+            current_user["address"] = user_obj.address
+            current_user["password"] = user_obj.password
+        except KeyError as e:
+            if 'email' in str(e):
+                error_message = 'Ошибка: отсутствует поле "email" в запросе.'
+            elif 'first_name' in str(e):
+                error_message = 'Ошибка: отсутствует поле "first_name" в запросе.'
+            elif 'last_name' in str(e):
+                error_message = 'Ошибка: отсутствует поле "last_name" в запросе.'
+            elif 'phone_number' in str(e):
+                error_message = 'Ошибка: отсутствует поле "phone_number" в запросе.'
+            elif 'address' in str(e):
+                error_message = 'Ошибка: отсутствует поле "address" в запросе.'
+            else:
+                error_message = 'Ошибка: отсутствует поле в запросе.'
+        except User.DoesNotExist:
+            error_message = 'Ошибка: пользователь не найден.'
+
+        data = {
+            'current_user': current_user,
+            'locations': locations,
+            'error_message': error_message
+        }
+
+    return render(request, 'main/account.html', data)
+def admin_login(request):
+    user = User.objects.get(email=current_user['email'])
+    email = user.email
+    username = email[:email.find('@')]
+    print(username)
+    password = encrypt_decrypt_password(user.password, 15)
+
+    try:
+        Admin.objects.get(username=username)
+    except Admin.DoesNotExist:
+        admin = Admin.objects.create_user(username, '', password)
+        admin.first_name = user.first_name
+        admin.last_name = user.last_name
+        admin.is_active = True  # Активировать учетную запись
+        admin.is_admin = True
+        admin.is_staff = True
+        admin.is_superuser = True  # Установить статус суперпользователя
+        admin.save()
+        return redirect('/admin/')
+    else:
+        return redirect('/admin/')
 def logout(request):
     current_user["user_id"] = None
     current_user["first_name"] = ""
@@ -180,9 +279,15 @@ def logout(request):
 def car_rent(request):
     car_id = request.POST['car_id']
     car = Car.objects.get(car_id=car_id)
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
+    max_day = today + timedelta(days=3650)
     data = {
         'car': car,
-        'current_user': current_user
+        'current_user': current_user,
+        'today': today.strftime('%Y-%m-%d'),
+        'tomorrow': tomorrow.strftime('%Y-%m-%d'),
+        'max_day': max_day.strftime('%Y-%m-%d')
     }
     return render(request, 'main/order.html', data)
 def addRent(request):
@@ -193,6 +298,9 @@ def addRent(request):
         end_date = request.POST.get('end_date')
         total_cost = request.POST.get('total_cost')
 
+        car = Car.objects.get(car_id=car_id)
+        car.is_free = False
+        car.save()
         rental = Rental(car_id=car_id, user_id=user_id, start_date=start_date, end_date=end_date, total_cost=total_cost)
         rental.save()
 
@@ -379,3 +487,4 @@ def encrypt_decrypt_password(password, key):
         encrypted_char = chr(ord(char) ^ key)
         encrypted_password += encrypted_char
     return encrypted_password
+

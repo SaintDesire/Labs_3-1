@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{{ messages }}
+    <h1>Аренда авто</h1>
+
+    <h1>Информация о машине</h1>
+
+    <h2>{{ car.brand }} {{ car.model }}</h2>
+    <p>Цвет: {{ car.color }}</p>
+    <p>Год выпуска: {{ car.year }}</p>
+    <p>Статус: {{ car.status }}</p>
+    <p>Номер: {{ car.number }}</p>
+    <p>Местоположение: {{ car.location.address }}</p>
+
+    <!-- Форма для внесения записи в таблицу -->
+    <form action="{% url 'addRent' %}" method="POST">
+        {% csrf_token %}
+        <label for="car_id">ID авто:</label>
+        <input type="text" name="car_id" id="car_id" value="{{ car.car_id }}" readonly>
+
+        <label for="user_id">ID пользователя:</label>
+        <input type="text" name="user_id" id="user_id" value="{{ current_user.user_id }}">
+
+        <label for="start_date">Дата начала аренды:</label>
+        <input type="date" name="start_date" id="start_date" min="{{ today }}" value="{{ today }}" max="{{ max_day }}">
+
+        <label for="end_date">Дата окончания аренды:</label>
+        <input type="date" name="end_date" id="end_date" min="{{ tomorrow }}" value="{{ tomorrow }}" max="{{ max_day }}">
+
+        <label for="total_cost">Общая стоимость:</label>
+        <input type="text" name="total_cost" id="total_cost" readonly>
+
+        <input type="submit" value="Добавить запись">
+    </form>
+
+<script>
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const totalCostInput = document.getElementById('total_cost');
+    const pricePerDay = 5;
+
+    function calculateTotalCost() {
+      const startDate = new Date(startDateInput.value);
+      const endDate = new Date(endDateInput.value);
+      const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+      const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      const totalCost = diffDays * pricePerDay;
+      totalCostInput.value = totalCost;
+    }
+    calculateTotalCost()
+    startDateInput.addEventListener('change', calculateTotalCost);
+    endDateInput.addEventListener('change', calculateTotalCost);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Личный кабинет</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+        }
+        .suggestion {
+            display: block;
+            padding: 5px 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .suggestion:hover {
+            background-color: #ebebeb;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <a href="{% url 'home' %}">Главная</a>
+        <a href="{% url 'logout' %}">Выйти с аккаунта</a>
+
+        {% if user.role == 'admin' %} <a href="{% url 'admin' %}">Админка</a> {% endif %}
+        <h1>Личный кабинет</h1>
+        {{ error_message }}
+        <form action="{% url 'update_account' %}" method="POST">
+            {% csrf_token %}
+            <label for="first_name">Имя:</label><br>
+            <input type="text" name="first_name" id="first_name" value="{{ current_user.first_name }}" required><br>
+            <label for="last_name">Фамилия:</label><br>
+            <input type="text" name="last_name" id="last_name" value="{{ current_user.last_name }}" required><br>
+            <label for="email">Email:</label><br>
+            <input type="email" name="email" id="email" value="{{ current_user.email }}" required><br>
+            <label for="phone_number">Телефон:</label><br>
+            <input type="text" name="phone_number" id="phone_number" value="{{ current_user.phone }}" required><br>
+            <label for="address">Адрес:</label><br>
+            <input type="text" name="address" id="addressInput" value="{{ current_user.address }}">
+            <div id="suggestionsContainer"></div>
+            <label for="oldPassword" id="oldPasswordLabel" style="visibility: hidden">Старый пароль:</label><br>
+            <input type="password" name="oldPassword" id="oldPassword" style="visibility: hidden"><br>
+            <label for="newPassword" id="newPasswordLabel" style="visibility: hidden">Новый пароль:</label><br>
+            <input type="password" name="newPassword" id="newPassword" style="visibility: hidden"><br>
+            <button type="button" id="togglePasswordFields">Изменить пароль</button><br>
+            <input type="submit" value="Сохранить">
+        </form>
+
+        {% for rental in rentals %}
+          <div class="rental">
+            <h3>Номер заказа: {{ rental.rental_id }}</h3>
+            <p>Модель машины: {{ rental.car.model }}</p>
+              <p>Год выпуска машины: {{ rental.car.year }}</p>
+              <p>Номер машины: {{ rental.car.number }}</p>
+            <p>Дата начала аренды: {{ rental.start_date }}</p>
+            <p>Дата конца аренды: {{ rental.end_date }}</p>
+            <p>Сумма заказа: {{ rental.total_cost }}</p>
+          </div>
+        {% endfor %}
+    </div>
+
+
+
+    <div style="display: none">
+        {% for location in locations %}
+            <div class="location-item">{{ location.address }}</div>
+        {% endfor %}
+    </div>
+    <script>
+        var togglePasswordFieldsButton = document.getElementById('togglePasswordFields');
+        var oldPasswordField = document.getElementById('oldPassword');
+        var newPasswordField = document.getElementById('newPassword');
+        var oldPasswordLabel = document.getElementById('oldPasswordLabel');
+        var newPasswordLabel = document.getElementById('newPasswordLabel');
+
+        togglePasswordFieldsButton.addEventListener('click', function() {
+            if (oldPasswordField.style.visibility === 'hidden' && newPasswordField.style.visibility === 'hidden') {
+                oldPasswordField.style.visibility = 'visible';
+                newPasswordField.style.visibility = 'visible';
+                oldPasswordLabel.style.visibility = 'visible';
+                newPasswordLabel.style.visibility = 'visible';
+            } else {
+                oldPasswordField.style.visibility = 'hidden';
+                newPasswordField.style.visibility = 'hidden';
+                oldPasswordLabel.style.visibility = 'hidden';
+                newPasswordLabel.style.visibility = 'hidden';
+            }
+        });
+
+     // Получаем элементы DOM
+    const addressInput = document.getElementById("addressInput");
+    const suggestionsContainer = document.getElementById("suggestionsContainer");
+
+    // Получаем адреса из элементов <div>
+    const locationDivs = document.querySelectorAll(".location-item");
+    const locations = Array.from(locationDivs).map(locationDiv => locationDiv.textContent.trim().toLowerCase());
+
+    // Событие при вводе в поле ввода адреса
+    addressInput.addEventListener("keyup", function() {
+        const inputValue = addressInput.value.toLowerCase();
+        if (inputValue.length >= 3) {
+            // Фильтруем адреса, которые соответствуют введенному значению
+            const filteredLocations = locations.filter(location => location.includes(inputValue));
+
+            // Очищаем контейнер подсказок
+            suggestionsContainer.innerHTML = "";
+
+            // Создаем и добавляем элементы подсказок
+            filteredLocations.forEach(location => {
+                const suggestion = document.createElement("div");
+                suggestion.classList.add("suggestion");
+                suggestion.innerHTML = locationDivs[locations.indexOf(location)].textContent.trim();
+                suggestion.addEventListener("click", function() {
+                    addressInput.value = suggestion.innerHTML;
+                    suggestionsContainer.innerHTML = "";
+                });
+                suggestionsContainer.appendChild(suggestion);
+            });
+        } else {
+            // Если введено менее 3 символов, очищаем контейнер подсказок
+            suggestionsContainer.innerHTML = "";
+        }
+    });
+    </script>
+</body>
+</html>

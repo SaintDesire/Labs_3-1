@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
     <style>
         #map {
-            height: 600px;
+            height: 800px;
             width: 100%;
         }
         .button {
@@ -39,24 +39,21 @@
         {% endif %}
     </div>
     <div id="map"></div>
+    <div id="user-marker"></div>
 
     <div id="car-data" style="display: none;">
         {% for car_data in car_data %}
             <div class="car" data-latitude="{{ car_data.coordinates.latitude }}" data-longitude="{{ car_data.coordinates.longitude }}"
                 data-car-id="{{ car_data.car.car_id }}" data-brand="{{ car_data.car.brand }}" data-model="{{ car_data.car.model }}"
-                data-color="{{ car_data.car.color }}" data-number="{{ car_data.car.number }}">
+                data-color="{{ car_data.car.color }}" data-number="{{ car_data.car.number }}" data-is-free="{{ car_data.car.is_free }}">
             </div>
         {% endfor %}
-        <p class="current-user" data-user-id="{{ current_user.user_id }}"/>
-    </div>
 
+    </div>
+    <p class="current-user" data-user-id="{{ current_user.user_id }}" data-user-latitude="{{ user_coordinates.latitude }}" data-user-longitude="{{ user_coordinates.longitude }}" style="display: none"/>
 
     {% csrf_token %}
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script>
-
-        var staticPath = "{% static 'main/img/pin.svg' %}";
-    </script>
     <script src="{% static 'main/js/map.js' %}"></script>
 
 </body>
