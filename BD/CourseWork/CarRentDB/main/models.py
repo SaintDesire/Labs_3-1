@@ -39,12 +39,20 @@ class User(models.Model):
     password = models.CharField(max_length=128, default=None)
     role = models.CharField(max_length=50, choices=ROLES, default='user')
     ban_end_date = models.DateField(null=True, blank=True, validators=[MinValueValidator(limit_value=date.today() + timedelta(days=1))])
-
+    is_active = models.BooleanField(default=True)
+    is_banned = models.BooleanField(default=False)
     def is_admin(self):
         return self.role == 'admin'
 
     def is_banned(self):
         return self.ban_end_date is not None and self.ban_end_date >= timezone.now().date()
+
+    def save(self, *args, **kwargs):
+        if self.is_banned:
+            self.ban_end_date = date.today() + timedelta(days=1)
+        else:
+            self.ban_end_date = None
+        super().save(*args, **kwargs)
 
 
 class Rental(models.Model):

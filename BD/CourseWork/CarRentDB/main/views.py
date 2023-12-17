@@ -41,24 +41,25 @@ def index(request):
                 break
 
     for car in cars:
-        car_location = car.location.location_id
+        if car.is_free:
+            car_location = car.location.location_id
 
-        car_coordinates = None
-        for location in locations:
+            car_coordinates = None
+            for location in locations:
 
 
-            if location.location_id == car_location:
-                car_coordinates = {
-                    'longitude': location.geom.x,
-                    'latitude': location.geom.y,
-                }
-                break
+                if location.location_id == car_location:
+                    car_coordinates = {
+                        'longitude': location.geom.x,
+                        'latitude': location.geom.y,
+                    }
+                    break
 
-        # Создаем словарь с данными о машине и ее координатах
-        car_data.append({
-            'car': car,
-            'coordinates': car_coordinates,
-        })
+            # Создаем словарь с данными о машине и ее координатах
+            car_data.append({
+                'car': car,
+                'coordinates': car_coordinates,
+            })
 
     data = {
         'car_data': car_data,
@@ -159,7 +160,6 @@ def account(request):
 
     rentals = Rental.objects.filter(user=user_id)
     user = User.objects.get(user_id=user_id)
-    print(user.role)
     data = {
         'current_user': current_user,
         'rentals': rentals,
