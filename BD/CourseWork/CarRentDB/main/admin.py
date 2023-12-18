@@ -86,7 +86,7 @@ admin.site.register(Node, NodeAdmin)
 
 
 class EdgeAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'car_count', 'car_list')
+    list_display = ('user_id', 'car_count', 'car_list', 'get_user_outcome')
 
     def user_id(self, obj):
         return obj.previous_node.data.get('user')
@@ -124,6 +124,26 @@ class EdgeAdmin(admin.ModelAdmin):
             car_list.append(car_data)
 
         return car_list
+
+    def get_user_outcome(self, obj):
+        with connection.cursor() as cursor:
+            query = """
+                SELECT next_node_id
+                FROM main_edge
+                WHERE previous_node_id = %s;
+            """
+            cursor.execute(query, [obj.previous_node_id])
+            rows = cursor.fetchall()
+            car_ids = [row[0] for row in rows]
+
+        user_outcome = 0
+        for car_id in car_ids:
+            car_node = Node.objects.get(id=car_id)
+            car_data = json.loads(car_node.data['income'])
+            outcome = int(car_data)
+            user_outcome += outcome
+
+        return user_outcome
 
 
 admin.site.register(Edge, EdgeAdmin)
