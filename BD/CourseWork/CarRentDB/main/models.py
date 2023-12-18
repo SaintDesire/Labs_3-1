@@ -2,6 +2,7 @@ from datetime import timezone, date, timedelta
 
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 
 
@@ -63,6 +64,18 @@ class Rental(models.Model):
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
 
+class Node(models.Model):
+    id = models.AutoField(primary_key=True)
+    data = models.JSONField()
+
+class Edge(models.Model):
+    previous_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='outgoing_edges')
+    next_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='incoming_edges')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['previous_node', 'next_node'], name='unique_edge')
+        ]
 
 
 carsDictionary = {

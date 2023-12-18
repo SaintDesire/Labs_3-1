@@ -108,6 +108,7 @@
         <a href="{% url 'logout' %}">Выйти с аккаунта</a>
 
         {% if user.role == 'admin' %} <a href="{% url 'admin' %}">Админка</a> {% endif %}
+        <a href="{% url 'deleteAccount' %}">Удалить аккаунт</a>
         <h1>Личный кабинет</h1>
         {{ error_message }}
         <form action="{% url 'update_account' %}" method="POST">

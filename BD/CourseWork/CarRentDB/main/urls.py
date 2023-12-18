@@ -12,4 +12,5 @@ urlpatterns = [
     path('update_account/', views.update_account, name='update_account'),
     path('/admin/', views.admin_login, name='admin'),
     path('receipt/', views.generate_payment_receipt, name='receipt'),
+    path('deleteAccount/', views.delete_account, name='deleteAccount'),
 ]

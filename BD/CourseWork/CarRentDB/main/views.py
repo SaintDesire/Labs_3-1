@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.utils.encoding import smart_str
 from reportlab.pdfgen import canvas
 
-from main.models import Car, carsDictionary, Location, User, Rental
+from main.models import Car, carsDictionary, Location, User, Rental, Node, Edge
 from faker import Faker
 from django.contrib.auth.models import User as Admin
 
@@ -162,6 +162,13 @@ def signup(request):
                 current_user["phone"] = user.phone
                 current_user["address"] = user.address
                 current_user["password"] = password
+
+
+                node_data = {
+                    "user": f"{user.user_id}",
+                }
+                node = Node(data=node_data)
+                node.save()
                 return redirect('home')
             elif not email_validate:
                 messages.error(request, 'Введите корректный адрес электронной почты')
@@ -295,6 +302,19 @@ def logout(request):
     current_user["address"] = ""
     current_user["password"] = ""
     return redirect('home')
+def delete_account(request):
+    user = User.objects.get(user_id=current_user["user_id"])
+    user.is_active = False
+    user.save()
+
+    current_user["user_id"] = None
+    current_user["first_name"] = ""
+    current_user["last_name"] = ""
+    current_user["email"] = ""
+    current_user["phone"] = ""
+    current_user["address"] = ""
+    current_user["password"] = ""
+    return redirect('home')
 def car_rent(request):
     car_id = request.POST['car_id']
     car = Car.objects.get(car_id=car_id)
@@ -323,6 +343,39 @@ def addRent(request):
         car.save()
         rental = Rental(car_id=car_id, user_id=user_id, start_date=start_date, end_date=end_date, total_cost=total_cost)
         rental.save()
+
+        model = f"{car.brand} {car.model}"  # Объединение значений brand и model в одну строку
+
+        car_node_data = {
+            "car": car_id,
+            "user_id": user_id,
+            "income": total_cost,
+            "model": model
+        }
+        car_node = Node(data=car_node_data)
+        car_node.save()
+        # with connection.cursor() as cursor:
+        #     query = '''
+        #         SELECT data->>'user'
+        #         FROM main_node WHERE data->>'user' = CAST(%s AS text)
+        #     '''
+        #     cursor.execute(query, [str(user_id)])
+        #     row = cursor.fetchone()  # Получить первую строку результата
+        #
+        #     if row is not None:
+        #         print(row)
+        #     else:
+        #         print("Узел с указанным user_id не найден")
+
+        user_node = Node.objects.filter(data__has_key='user', data__user=str(user_id)).first()
+
+        if user_node is None:
+            # Если узел не найден, обработать соответствующую логику
+            print("Узел с информацией о пользователе не найден")
+        else:
+            print(user_node.data['user'])
+        edge = Edge(previous_node=user_node, next_node=car_node)
+        edge.save()
 
         return redirect('home')
     else:
@@ -394,34 +447,6 @@ def parse_coordinates(geom_char):
             return None
     else:
         return None
-def location_list(request):
-    query = """
-    SELECT location_id, address, geom.STAsText() AS geom_char
-    FROM locations;
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-        locations = []
-        for row in cursor.fetchall():
-            location_id = row[0]
-            address = row[1]
-            geom_char = row[2]
-
-            coordinates = parse_coordinates(geom_char)
-            if coordinates:
-                location_longitude = coordinates['longitude']
-                location_latitude = coordinates['latitude']
-                locations.append({
-                    'location_id': location_id,
-                    'address': address,
-                    'longitude': location_longitude,
-                    'latitude': location_latitude,
-                })
-            else:
-                print(f"Invalid coordinate format for location ID {location_id}")
-
-    # Вернуть список словарей с информацией о местоположениях
-    return locations
 def addNewCars():
     for _ in range(400):
         brand = random.choice(list(carsDictionary.keys()))

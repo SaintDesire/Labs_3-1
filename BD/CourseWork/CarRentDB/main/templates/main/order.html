@@ -74,8 +74,8 @@
     </style>
 </head>
 <body>
+    <h1><a href="{% url 'home' %}" style="padding: 10px 5px; border-radius: 5px; color: white; text-decoration: none">Главная</a></h1>
     <h1>Аренда авто</h1>
-
     <h1>Информация о машине</h1>
 
     <h2>{{ car.brand }} {{ car.model }}</h2>
@@ -117,12 +117,22 @@
     function calculateTotalCost() {
       const startDate = new Date(startDateInput.value);
       const endDate = new Date(endDateInput.value);
-      const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
-      const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      const totalCost = diffDays * pricePerDay;
-      totalCostInput.value = totalCost;
+      if (startDate >= endDate) {
+        const newEndDate = new Date(startDate);
+        newEndDate.setDate(startDate.getDate() + 1);
+        endDateInput.value = newEndDate.toISOString().split('T')[0];
+        totalCostInput.value = pricePerDay;
+      } else {
+          const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+          const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+          const totalCost = diffDays * pricePerDay;
+          totalCostInput.value = totalCost;
+      }
+
+
     }
-    calculateTotalCost()
+
+    calculateTotalCost();
     startDateInput.addEventListener('change', calculateTotalCost);
     endDateInput.addEventListener('change', calculateTotalCost);
 
