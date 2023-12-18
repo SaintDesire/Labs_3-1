@@ -447,8 +447,8 @@ def parse_coordinates(geom_char):
             return None
     else:
         return None
-def addNewCars():
-    for _ in range(400):
+def addNewCars(num_rows):
+    for _ in range(num_rows):
         brand = random.choice(list(carsDictionary.keys()))
         model = random.choice(list(carsDictionary[brand]["models"].keys()))
         color = random.choice(colors)
@@ -457,9 +457,9 @@ def addNewCars():
         letters = ''.join(random.choices(string.ascii_uppercase, k=3))
         numbers = ''.join(random.choices(string.digits, k=3))
         number = letters + numbers
-        max_index = Location.objects.aggregate(max_index=Max('index'))['max_index']
-        min_index = Location.objects.aggregate(min_index=Min('index'))['min_index']
-        location_id = random.randint(min_index, max_index)
+        max_location_id = Location.objects.aggregate(max_location_id=Max('location_id'))['max_location_id']
+        min_location_id = Location.objects.aggregate(min_location_id=Min('location_id'))['min_location_id']
+        location_id = random.randint(min_location_id, max_location_id)
 
         car = Car.objects.create(
             brand=brand,
@@ -580,9 +580,7 @@ def get_coordinates_by_street(street_name):
         return None
 def fillUsersTable(num_rows):
     fake = Faker()
-    locations = Location.objects.values_list('address', flat=True)  # Получаем все адреса из таблицы locations
-    locations_list = list(locations)  # Преобразуем полученные адреса в список
-    num_locations = len(locations_list)
+    locations = Location.objects.all()
 
     for _ in range(num_rows):
         first_name = fake.first_name()
@@ -593,7 +591,7 @@ def fillUsersTable(num_rows):
         phone_number = prefix + area_code + ''.join(random.choices(string.digits, k=7))
 
         # Получаем случайный адрес из списка locations_list
-        random_address = random.choice(locations_list)
+        random_address = random.choice(locations)
 
         # Генерация случайного пароля
         password = fake.password()
@@ -621,3 +619,27 @@ def encrypt_decrypt_password(password, key):
         encrypted_password += encrypted_char
     return encrypted_password
 
+def generate_orders(num_rows):
+    for _ in range(num_rows):
+        car_id = random.randint(100, 1000)
+        user_id = random.randint(1, 1000)
+        start_date = datetime.now() + timedelta(days=random.randint(1, 30))
+        end_date = start_date + timedelta(days=random.randint(1, 7))
+        total_cost = random.randint(100, 1000)
+
+        car = Car.objects.get(car_id=car_id)
+        car.is_free = False
+        car.save()
+        rental = Rental(car_id=car_id, user_id=user_id, start_date=start_date, end_date=end_date, total_cost=total_cost)
+        rental.save()
+
+        model = f"{car.brand} {car.model}"
+
+        car_node_data = {
+            "car": car_id,
+            "user_id": user_id,
+            "income": total_cost,
+            "model": model
+        }
+        car_node = Node(data=car_node_data)
+        car_node.save()
