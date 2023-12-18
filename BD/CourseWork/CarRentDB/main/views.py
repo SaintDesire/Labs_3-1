@@ -1,12 +1,17 @@
+import io
 import random, os, requests, xml.etree.ElementTree as ET, string,re
-from datetime import date, timedelta
-from django.contrib.auth import logout, login, authenticate
+from datetime import date, timedelta, datetime
+from urllib import response
+
 from django.contrib.gis.geos import Point
 from django.db import connection
-from django.http import HttpResponse
+from django.db.models import Min, Max
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth.models import User as AuthUser
+from django.utils.encoding import smart_str
+from reportlab.pdfgen import canvas
+
 from main.models import Car, carsDictionary, Location, User, Rental
 from faker import Faker
 from django.contrib.auth.models import User as Admin
@@ -75,6 +80,20 @@ def login(request):
             password = request.POST['password']
             user = User.objects.get(email=email)
             email_valid = validate_email(email)
+            if user.is_banned:
+                error_message = 'Your account has been banned. Ban untill ' + str(user.ban_end_date)
+                data = {
+                    'error_message': error_message,
+                    'user': user,
+                }
+                return render(request, 'main/login.html', data)
+            if user.is_active is False:
+                error_message = 'Your account has been deleted'
+                data = {
+                    'error_message': error_message,
+                    'user': user,
+                }
+                return render(request, 'main/login.html', data)
             if password == encrypt_decrypt_password(user.password, key) and email_valid:
                 current_user["user_id"] = user.user_id
                 current_user["first_name"] = user.first_name
@@ -282,6 +301,7 @@ def car_rent(request):
     today = date.today()
     tomorrow = today + timedelta(days=1)
     max_day = today + timedelta(days=3650)
+    print(car.price)
     data = {
         'car': car,
         'current_user': current_user,
@@ -304,8 +324,51 @@ def addRent(request):
         rental = Rental(car_id=car_id, user_id=user_id, start_date=start_date, end_date=end_date, total_cost=total_cost)
         rental.save()
 
-
         return redirect('home')
+    else:
+        # Обрабатываем случай, когда метод запроса не является POST
+        return HttpResponse(status=405)
+def generate_payment_receipt(request):
+    rental_id = request.POST['rental_id']
+    car_model = request.POST['car_model']
+    car_year = request.POST['car_year']
+    car_number = request.POST['car_number']
+    start_date = request.POST['start_date']
+    end_date = request.POST['end_date']
+    total_cost = request.POST['total_cost']
+    rental = Rental.objects.get(rental_id=rental_id)
+    user = User.objects.get(user_id=rental.user_id)
+
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+
+    # Устанавливаем шрифт "Helvetica"
+    p.setFont("Helvetica", 12)
+
+    # Настраиваем размеры текста
+    line_height = 14
+    margin = 50
+
+    # Получаем текущую дату и время и форматируем его в "день.месяц.год часы:минуты"
+    current_datetime = datetime.now().strftime("%d.%m.%Y %H:%M")
+
+    # Генерируем содержимое квитанции
+    p.drawString(margin, 800 - line_height * 2, smart_str(f"Order ID: {rental_id}"))
+    p.drawString(margin, 800 - line_height * 3, smart_str(f"User name: {user.first_name} {user.last_name}"))
+    p.drawString(margin, 800 - line_height * 4, smart_str(f"Start date: {rental.start_date}"))
+    p.drawString(margin, 800 - line_height * 5, smart_str(f"End date: {rental.end_date}"))
+    p.drawString(margin, 800 - line_height * 6, smart_str(f"Total cost: {total_cost}"))
+    p.drawString(margin, 800 - line_height * 7, smart_str(f"Current date and time: {current_datetime}"))
+
+    # Завершаем генерацию PDF
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="receipt.pdf"'
+
+    return response
 def validate_email(email):
     # Regular expression pattern to validate email
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
@@ -369,7 +432,9 @@ def addNewCars():
         letters = ''.join(random.choices(string.ascii_uppercase, k=3))
         numbers = ''.join(random.choices(string.digits, k=3))
         number = letters + numbers
-        location_id = random.randint(1, 1213)
+        max_index = Location.objects.aggregate(max_index=Max('index'))['max_index']
+        min_index = Location.objects.aggregate(min_index=Min('index'))['min_index']
+        location_id = random.randint(min_index, max_index)
 
         car = Car.objects.create(
             brand=brand,
@@ -378,7 +443,8 @@ def addNewCars():
             year=year,
             status=status,
             number=number,
-            location_id=location_id
+            location_id=location_id,
+            price=carsDictionary[brand]["models"][model]["price"]
         )
 
         car.save()
@@ -392,6 +458,10 @@ def addNewLocations():
 
     streets = []
 
+    # Создаем новый элемент для записи данных
+    data_element = ET.Element('data')
+
+    # Проходим по списку streets и создаем элементы street
     for street in root.findall('street'):
         name = street.find('name').text
         street_type = street.find('type').text
@@ -407,6 +477,14 @@ def addNewLocations():
                     print(f"Coordinates for {street_name}: {geo}")
                     location = Location(address=street_name, geom=geo)
                     location.save()
+                    # Создаем элемент street и добавляем его в элемент data
+                    street_element = ET.Element('street')
+                    street_element.text = street_name
+                    street_element.set('lat', str(lat))
+                    street_element.set('lon', str(lon))
+                    data_element.append(street_element)
+
+                    print(f'Adding {street_name}')
                 else:
                     print(f"Invalid coordinates for {street_name}: {coordinates}")
             else:
@@ -419,10 +497,40 @@ def addNewLocations():
                         print(f"Coordinates for {name}: {geo}")
                         location = Location(address=name, geom=geo)
                         location.save()
+                        # Создаем элемент street и добавляем его в элемент data
+                        street_element = ET.Element('street')
+                        street_element.text = name
+                        street_element.set('lat', str(lat))
+                        street_element.set('lon', str(lon))
+                        data_element.append(street_element)
+
+                        print(f'Adding {name}')
                     else:
                         print(f"Invalid coordinates for {name}: {coordinates}")
+
+    # Создаем новое дерево XML и записываем в него данные
+    xml_tree = ET.ElementTree(data_element)
+
+    xml_file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'streetsWithCoordinates.xml')
+
+    # Записываем данные в XML файл
+    xml_tree.write(xml_file_path, encoding='utf-8', method='xml')
     print(streets)
     return
+def import_data_from_xml():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'streetsWithCoordinates.xml')
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+
+    for street in root.findall('street'):
+        lat = street.get('lat')
+        lon = street.get('lon')
+        address = street.text
+
+        location = Location(address=address)
+        location.geom = f'POINT({lon} {lat})'
+        location.save()
 def get_coordinates_by_street(street_name):
     url = 'https://nominatim.openstreetmap.org/search'
     params = {

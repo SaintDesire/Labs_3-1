@@ -12,7 +12,7 @@ class CarAdmin(admin.ModelAdmin):
 admin.site.register(Car, CarAdmin)
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'phone', 'get_address', 'get_decrypted_password')
+    list_display = ('first_name', 'last_name', 'email', 'phone', 'get_address', 'get_decrypted_password', 'is_active')
 
     def get_address(self, obj):
         return obj.address.address
@@ -24,11 +24,13 @@ class UserAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if obj.pk:
-            # Если пользователь уже существует, сохраняем зашифрованный пароль
-            obj.password = encrypt_decrypt_password(obj.password, 15)
-        else:
-            # Если это новый пользователь, сохраняем пароль без изменений
-            pass
+            # Если пользователь уже существует
+            if 'password' not in form.changed_data:
+                # Если поле password не изменено, оставляем его без изменений
+                obj.password = User.objects.get(pk=obj.pk).password
+            else:
+                # Если поле password изменено, шифруем новый пароль
+                obj.password = encrypt_decrypt_password(obj.password, 15)
 
         super().save_model(request, obj, form, change)
 

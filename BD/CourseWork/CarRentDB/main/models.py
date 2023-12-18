@@ -24,6 +24,7 @@ class Car(models.Model):
     number = models.CharField(max_length=20, default='Unknown')
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, default=None)
     is_free = models.BooleanField(default=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2, null=False, default=5)
 
 class User(models.Model):
     ROLES = (
@@ -41,11 +42,9 @@ class User(models.Model):
     ban_end_date = models.DateField(null=True, blank=True, validators=[MinValueValidator(limit_value=date.today() + timedelta(days=1))])
     is_active = models.BooleanField(default=True)
     is_banned = models.BooleanField(default=False)
-    def is_admin(self):
+    def isAdmin(self):
         return self.role == 'admin'
 
-    def is_banned(self):
-        return self.ban_end_date is not None and self.ban_end_date >= timezone.now().date()
 
     def save(self, *args, **kwargs):
         if self.is_banned:
@@ -71,9 +70,11 @@ carsDictionary = {
         "models": {
             "X5": {
                 "year": 2020,
+                "price": 15
             },
             "3 Series": {
                 "year": 2019,
+                "price": 10
             }
         }
     },
@@ -81,9 +82,11 @@ carsDictionary = {
         "models": {
             "Camry": {
                 "year": 2020,
+                "price": 12
             },
             "Corolla": {
                 "year": 2021,
+                "price": 9
             }
         }
     },
@@ -91,9 +94,11 @@ carsDictionary = {
         "models": {
             "Civic": {
                 "year": 2021,
+                "price": 14
             },
             "Accord": {
                 "year": 2020,
+                "price": 11
             }
         }
     },
@@ -101,9 +106,11 @@ carsDictionary = {
         "models": {
             "A3": {
                 "year": 2019,
+                "price": 13
             },
             "A4": {
                 "year": 2020,
+                "price": 10
             }
         }
     },
@@ -111,9 +118,11 @@ carsDictionary = {
         "models": {
             "C-Class": {
                 "year": 2021,
+                "price": 16
             },
             "E-Class": {
                 "year": 2020,
+                "price": 15
             }
         }
     },
@@ -121,9 +130,11 @@ carsDictionary = {
         "models": {
             "Golf": {
                 "year": 2021,
+                "price": 11
             },
             "Passat": {
                 "year": 2020,
+                "price": 10
             }
         }
     },
@@ -131,9 +142,11 @@ carsDictionary = {
         "models": {
             "Focus": {
                 "year": 2021,
+                "price": 9
             },
             "Mustang": {
                 "year": 2020,
+                "price": 14
             }
         }
     },
@@ -141,9 +154,11 @@ carsDictionary = {
         "models": {
             "Cruze": {
                 "year": 2020,
+                "price": 12
             },
             "Malibu": {
                 "year": 2019,
+                "price": 11
             }
         }
     },
@@ -151,9 +166,11 @@ carsDictionary = {
         "models": {
             "Sentra": {
                 "year": 2021,
+                "price": 10
             },
             "Altima": {
                 "year": 2020,
+                "price": 13
             }
         }
     },
@@ -161,9 +178,11 @@ carsDictionary = {
         "models": {
             "Impreza": {
                 "year": 2021,
+                "price": 15
             },
             "Forester": {
                 "year": 2020,
+                "price": 12
             }
         }
     }

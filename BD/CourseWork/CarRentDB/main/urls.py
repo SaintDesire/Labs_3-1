@@ -11,4 +11,5 @@ urlpatterns = [
     path('car_rent/', views.car_rent, name='car_rent'),
     path('update_account/', views.update_account, name='update_account'),
     path('/admin/', views.admin_login, name='admin'),
+    path('receipt/', views.generate_payment_receipt, name='receipt'),
 ]
