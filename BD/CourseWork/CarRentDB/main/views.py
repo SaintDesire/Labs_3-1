@@ -1,9 +1,12 @@
+import codecs
 import io
 import random, os, requests, xml.etree.ElementTree as ET, string,re
 from datetime import date, timedelta, datetime
-from urllib import response
+from decimal import Decimal
+from urllib import response, request
 
 from django.contrib.gis.geos import Point
+from django.core.serializers import serialize
 from django.db import connection
 from django.db.models import Min, Max
 from django.http import HttpResponse, FileResponse
@@ -29,6 +32,9 @@ current_user = {
     "address": "",
     "password": ""
 }
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'data.xml')
 
 def index(request):
     locations = Location.objects.all()
@@ -542,7 +548,7 @@ def addNewLocations():
     xml_tree.write(xml_file_path, encoding='utf-8', method='xml')
     print(streets)
     return
-def import_data_from_xml():
+def import_streets_from_xml():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'streetsWithCoordinates.xml')
     tree = ET.parse(file_path)
@@ -643,3 +649,35 @@ def generate_orders(num_rows):
         }
         car_node = Node(data=car_node_data)
         car_node.save()
+
+def export_data_to_xml():
+    # Получаем все объекты из таблиц
+    locations = Location.objects.all()
+    cars = Car.objects.all()
+    users = User.objects.all()
+    rentals = Rental.objects.all()
+
+    # Преобразуем объекты в XML-представление и сохраняем их в отдельные файлы
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    locations_file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'locations.xml')
+    cars_file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'cars.xml')
+    users_file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'users.xml')
+    rentals_file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'rentals.xml')
+
+    with codecs.open(locations_file_path, 'w', encoding='utf-8') as locations_file:
+        locations_xml = serialize('xml', locations)
+        locations_file.write(locations_xml)
+
+    with codecs.open(cars_file_path, 'w', encoding='utf-8') as cars_file:
+        cars_xml = serialize('xml', cars)
+        cars_file.write(cars_xml)
+
+    with codecs.open(users_file_path, 'w', encoding='utf-8') as users_file:
+        users_xml = serialize('xml', users)
+        users_file.write(users_xml)
+
+    with codecs.open(rentals_file_path, 'w', encoding='utf-8') as rentals_file:
+        rentals_xml = serialize('xml', rentals)
+        rentals_file.write(rentals_xml)
+
+    print('Data exported successfully')

@@ -46,7 +46,6 @@ public class WebSiteTest {
         homePage.submitButtonClick();
         Thread.sleep(2000);
         Assert.assertTrue(homePage.isRequestAccepted());
-
     }
 
     @Test
