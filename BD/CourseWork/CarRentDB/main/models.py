@@ -12,6 +12,8 @@ class Location(models.Model):
     address = models.CharField(max_length=100)
     geom = models.PointField(srid=4326, default=None)
 
+    class Meta:
+        db_table = 'location'  # Здесь вы можете указать желаемое имя таблицы
     def __str__(self):
         return self.address
 
@@ -26,6 +28,10 @@ class Car(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, default=None)
     is_free = models.BooleanField(default=True)
     price = models.DecimalField(max_digits=8, decimal_places=2, null=False, default=5)
+
+    class Meta:
+        db_table = 'car'
+
 
 class User(models.Model):
     ROLES = (
@@ -46,13 +52,16 @@ class User(models.Model):
     def isAdmin(self):
         return self.role == 'admin'
 
-
     def save(self, *args, **kwargs):
         if self.is_banned:
             self.ban_end_date = date.today() + timedelta(days=1)
         else:
             self.ban_end_date = None
         super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'user'
+
 
 
 class Rental(models.Model):
@@ -63,10 +72,18 @@ class Rental(models.Model):
     end_date = models.DateField()
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
+    class Meta:
+        db_table = 'rental'
+
+
 
 class Node(models.Model):
     id = models.AutoField(primary_key=True)
     data = models.JSONField()
+
+    class Meta:
+        db_table = 'node'
+
 
 class Edge(models.Model):
     previous_node = models.ForeignKey(Node, on_delete=models.CASCADE, related_name='outgoing_edges')
@@ -76,6 +93,7 @@ class Edge(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['previous_node', 'next_node'], name='unique_edge')
         ]
+        db_table = 'edge'
 
 
 carsDictionary = {

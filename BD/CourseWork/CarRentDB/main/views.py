@@ -360,18 +360,6 @@ def addRent(request):
         }
         car_node = Node(data=car_node_data)
         car_node.save()
-        # with connection.cursor() as cursor:
-        #     query = '''
-        #         SELECT data->>'user'
-        #         FROM main_node WHERE data->>'user' = CAST(%s AS text)
-        #     '''
-        #     cursor.execute(query, [str(user_id)])
-        #     row = cursor.fetchone()  # Получить первую строку результата
-        #
-        #     if row is not None:
-        #         print(row)
-        #     else:
-        #         print("Узел с указанным user_id не найден")
 
         user_node = Node.objects.filter(data__has_key='user', data__user=str(user_id)).first()
 
@@ -617,6 +605,11 @@ def fillUsersTable(num_rows):
             address=random_address,
             password=encrypted_password
         )
+        node_data = {
+            "user": f"{user.user_id}",
+        }
+        node = Node(data=node_data)
+        node.save()
 def encrypt_decrypt_password(password, key):
     encrypted_password = ''
     for char in password:
@@ -649,6 +642,16 @@ def generate_orders(num_rows):
         }
         car_node = Node(data=car_node_data)
         car_node.save()
+
+        user_node = Node.objects.filter(data__has_key='user', data__user=str(user_id)).first()
+
+        if user_node is None:
+            # Если узел не найден, обработать соответствующую логику
+            print("Узел с информацией о пользователе не найден")
+        else:
+            print(user_node.data['user'])
+        edge = Edge(previous_node=user_node, next_node=car_node)
+        edge.save()
 
 def export_data_to_xml():
     # Получаем все объекты из таблиц
