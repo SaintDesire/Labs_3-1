@@ -84,41 +84,46 @@
             justify-content: center;
             height: auto;
         }
+        .error {
+          color: red;
+          margin-top: 5px;
+        }
     </style>
 </head>
 <body>
+    <div class="center">
+        <a href="{% url 'home' %}" style="padding: 10px 5px; border-radius: 5px">Главная</a>
+    </div>
+    <h1 style="text-align: center">Регистрация пользователя</h1>
     {% if messages %}
-    <ul>
+    <ul style="text-align: center; list-style-type: none; color: red">
         {% for message in messages %}
         <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
-    <div class="center">
-        <a href="{% url 'home' %}" style="padding: 10px 5px; border-radius: 5px">Главная</a>
-    </div>
-    <h1 style="text-align: center">Регистрация пользователя</h1>
     <div class="container">
-         <form method="post" action="{% url 'signup' %}">
+         <form method="post" action="{% url 'signup' %}" id="myForm">
             {% csrf_token %}
             <label for="first_name">Имя:</label>
-            <input type="text" name="first_name" id="first_name" value="{{ first_name }}">
+            <input type="text" name="first_name" id="first_name" value="{{ first_name }}" maxlength="50" required>
 
             <label for="last_name">Фамилия:</label>
-            <input type="text" name="last_name" id="last_name" value="{{ last_name }}">
+            <input type="text" name="last_name" id="last_name" value="{{ last_name }}" maxlength="50" required>
 
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" value="{{ email }}">
+            <input type="email" name="email" id="email" value="{{ email }}" maxlength="100" required>
 
             <label for="phone_number">Номер телефона:</label>
-            <input type="text" name="phone_number" id="phone_number" value="{{ phone_number }}">
+            <input type="text" name="phone_number" id="phone_number" value="{{ phone_number }}" maxlength="20" required>
 
             <label for="address">Адрес:</label>
-            <input type="text" name="address" id="addressInput" value="{{ current_user.address }}">
-            <div id="suggestionsContainer"></div>
+            <input type="text" name="address" id="addressInput" value="{{ current_user.address }}" maxlength="50" required>
+            <div id="addressError" class="error"></div>
+             <div id="suggestionsContainer"></div>
 
             <label for="password">Пароль:</label>
-            <input type="password" name="password" id="password">
+            <input type="password" name="password" id="password" maxlength="128" required>
 
             <input type="submit" value="Зарегистрироваться">
         </form>
@@ -131,7 +136,10 @@
     </div>
 <script>
      // Получаем элементы DOM
+    const phoneInput = document.getElementById("phone_number");
     const addressInput = document.getElementById("addressInput");
+    const phoneError = document.getElementById("phoneError");
+    const addressError = document.getElementById("addressError");
     const suggestionsContainer = document.getElementById("suggestionsContainer");
 
     // Получаем адреса из элементов <div>
@@ -163,6 +171,24 @@
             // Если введено менее 3 символов, очищаем контейнер подсказок
             suggestionsContainer.innerHTML = "";
         }
+    });
+
+    const form = document.getElementById("myForm");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault(); // Отменяем стандартное действие отправки формы
+
+      const address = addressInput.value.toLowerCase();
+      // Проверяем, состоит ли номер телефона только из цифр и знака "+"
+      const phoneRegex = /^[0-9+]+$/;
+      if (!locations.includes(address)) {
+          addressInput.style.border = "1px solid red";
+          addressError.textContent = "Введите существующий адрес";
+      } else {
+          addressInput.style.border = "1px solid black";
+          addressError.textContent = "";
+          form.submit();
+      }
     });
 </script>
 </body>

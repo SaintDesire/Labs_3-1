@@ -157,6 +157,9 @@ def signup(request):
         except User.DoesNotExist:
             location = get_object_or_404(Location, address=address_id)
             email_validate = validate_email(email)
+            if len(phone_number) < 13:
+                messages.error(request, 'Длина введенного номера менее 13 символов')
+                return render(request, 'main/signup.html', user)
             if location and email_validate:
                 user = User(email=email, password=encrypt_decrypt_password(password, key), first_name=first_name,
                             last_name=last_name, phone=phone_number, address=location)
@@ -184,7 +187,7 @@ def signup(request):
                 return render(request, 'main/signup.html', user)
     else:
         locations = Location.objects.all()
-        return render(request, 'main/signup.html', {'locations': locations})
+        return render(request, 'main/signup.html', {'locations': locations, 'phone_number': '+'})
 def account(request):
     user_id = current_user["user_id"]
     locations = Location.objects.all()
@@ -203,6 +206,7 @@ def account(request):
 def update_account(request):
     data = {}
     locations = Location.objects.all()
+
     if request.method == 'POST':
         error_message = ''
 
@@ -213,6 +217,7 @@ def update_account(request):
             phone_number = request.POST['phone_number']
             address_id = request.POST['address']
             location = get_object_or_404(Location, address=address_id)
+            email_validate = validate_email(email)
             user = {
                 'email': email,
                 'first_name': first_name,
@@ -220,6 +225,20 @@ def update_account(request):
                 'phone_number': phone_number,
                 'address_id': address_id,
             }
+            if not email_validate:
+                data = {
+                    'current_user': current_user,
+                    'locations': locations
+                }
+                messages.error(request, 'Введите корректный адрес электронной почты')
+                return render(request, 'main/account.html', data)
+            if len(phone_number) < 13:
+                data = {
+                    'current_user': current_user,
+                    'locations': locations
+                }
+                messages.error(request, 'Длина введенного номера менее 13 символов')
+                return render(request, 'main/account.html', data)
             try:
                 data['old_password'] = request.POST['oldPassword']
                 data['new_password'] = request.POST['newPassword']
@@ -227,7 +246,7 @@ def update_account(request):
                 data['old_password'] = None
                 data['new_password'] = None
 
-            user_obj = User.objects.get(email=user['email'])
+            user_obj = User.objects.get(email=current_user['email'])
 
             if user['first_name'] != user_obj.first_name:
                 user_obj.first_name = user['first_name']
@@ -242,11 +261,11 @@ def update_account(request):
                     enc_password = encrypt_decrypt_password(data['old_password'], 15)
                     if enc_password == user_obj.password:
                         user_obj.password = encrypt_decrypt_password(data['new_password'], 15)
-                        error_message = 'Данные обновлены.'
+                        messages.error(request, 'Данные обновлены.')
                     else:
-                        error_message = 'Старый пароль введен неправильно.'
+                        messages.error(request, 'Старый пароль введен неправильно.')
                 except Exception:
-                    error_message = 'Ошибка при шифровании пароля.'
+                    messages.error(request, 'Ошибка при шифровании пароля.')
             user_obj.save()
             current_user["user_id"] = current_user["user_id"]
             current_user["first_name"] = user_obj.first_name
@@ -257,24 +276,23 @@ def update_account(request):
             current_user["password"] = user_obj.password
         except KeyError as e:
             if 'email' in str(e):
-                error_message = 'Ошибка: отсутствует поле "email" в запросе.'
+                messages.error(request, 'Ошибка: отсутствует поле "email" в запросе.')
             elif 'first_name' in str(e):
-                error_message = 'Ошибка: отсутствует поле "first_name" в запросе.'
+                messages.error(request, 'Ошибка: отсутствует поле "first_name" в запросе.')
             elif 'last_name' in str(e):
-                error_message = 'Ошибка: отсутствует поле "last_name" в запросе.'
+                messages.error(request, 'Ошибка: отсутствует поле "last_name" в запросе.')
             elif 'phone_number' in str(e):
-                error_message = 'Ошибка: отсутствует поле "phone_number" в запросе.'
+                messages.error(request, 'Ошибка: отсутствует поле "phone_number" в запросе.')
             elif 'address' in str(e):
-                error_message = 'Ошибка: отсутствует поле "address" в запросе.'
+                messages.error(request, 'Ошибка: отсутствует поле "address" в запросе.')
             else:
-                error_message = 'Ошибка: отсутствует поле в запросе.'
+                messages.error(request, 'Ошибка: отсутствует поле в запросе.')
         except User.DoesNotExist:
-            error_message = 'Ошибка: пользователь не найден.'
+            messages.error(request, 'Ошибка: пользователь не найден.')
 
         data = {
             'current_user': current_user,
-            'locations': locations,
-            'error_message': error_message
+            'locations': locations
         }
 
     return render(request, 'main/account.html', data)

@@ -100,6 +100,10 @@
         .suggestion:hover {
             background-color: #ebebeb;
         }
+        .error {
+          color: red;
+          margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -110,24 +114,38 @@
         {% if user.role == 'admin' %} <a href="{% url 'admin' %}">Админка</a> {% endif %}
         <a href="{% url 'deleteAccount' %}">Удалить аккаунт</a>
         <h1>Личный кабинет</h1>
-        {{ error_message }}
-        <form action="{% url 'update_account' %}" method="POST">
+            {% if messages %}
+                <ul style="text-align: center; list-style-type: none; color: red">
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        <form action="{% url 'update_account' %}" method="POST" id="myForm">
             {% csrf_token %}
             <label for="first_name">Имя:</label><br>
-            <input type="text" name="first_name" id="first_name" value="{{ current_user.first_name }}" required><br>
+            <input type="text" name="first_name" id="first_name" value="{{ current_user.first_name }}" maxlength="50" required><br>
+
             <label for="last_name">Фамилия:</label><br>
-            <input type="text" name="last_name" id="last_name" value="{{ current_user.last_name }}" required><br>
+            <input type="text" name="last_name" id="last_name" value="{{ current_user.last_name }}" maxlength="50" required><br>
+
             <label for="email">Email:</label><br>
-            <input type="email" name="email" id="email" value="{{ current_user.email }}" required><br>
+            <input type="email" name="email" id="email" value="{{ current_user.email }}" maxlength="100" required><br>
+
             <label for="phone_number">Телефон:</label><br>
-            <input type="text" name="phone_number" id="phone_number" value="{{ current_user.phone }}" required><br>
-            <label for="address">Адрес:</label><br>
-            <input type="text" name="address" id="addressInput" value="{{ current_user.address }}">
+            <input type="text" name="phone_number" id="phone_number" value="{{ current_user.phone }}" maxlength="20" required><br>
+
+            <label for="address">Адрес:</label>
+            <input type="text" name="address" id="addressInput" value="{{ current_user.address }}" maxlength="50" required>
+            <div id="addressError" class="error"></div>
             <div id="suggestionsContainer"></div>
+
             <label for="oldPassword" id="oldPasswordLabel" style="visibility: hidden">Старый пароль:</label><br>
-            <input type="password" name="oldPassword" id="oldPassword" style="visibility: hidden"><br>
+            <input type="password" name="oldPassword" id="oldPassword" style="visibility: hidden" maxlength="128"><br>
+
             <label for="newPassword" id="newPasswordLabel" style="visibility: hidden">Новый пароль:</label><br>
-            <input type="password" name="newPassword" id="newPassword" style="visibility: hidden"><br>
+            <input type="password" name="newPassword" id="newPassword" style="visibility: hidden" maxlength="128"><br>
+
             <button type="button" id="togglePasswordFields">Изменить пароль</button><br>
             <input type="submit" value="Сохранить">
         </form>
@@ -210,6 +228,24 @@
             // Если введено менее 3 символов, очищаем контейнер подсказок
             suggestionsContainer.innerHTML = "";
         }
+    });
+
+    const form = document.getElementById("myForm");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault(); // Отменяем стандартное действие отправки формы
+
+      const address = addressInput.value.toLowerCase();
+      // Проверяем, состоит ли номер телефона только из цифр и знака "+"
+      const phoneRegex = /^[0-9+]+$/;
+      if (!locations.includes(address)) {
+          addressInput.style.border = "1px solid red";
+          addressError.textContent = "Введите существующий адрес";
+      } else {
+          addressInput.style.border = "1px solid black";
+          addressError.textContent = "";
+          form.submit();
+      }
     });
     </script>
 </body>
