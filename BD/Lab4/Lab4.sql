@@ -1,0 +1,212 @@
+-- 1. Получите список всех файлов табличных пространств (перманентных  и временных).
+select * from dba_tablespaces;
+
+select TABLESPACE_NAME, FILE_NAME from SYS.DBA_DATA_FILES;
+select TABLESPACE_NAME, FILE_NAME from SYS.DBA_TEMP_FILES;
+
+-- 2. Создайте табличное пространство с именем XXX_QDATA (10m). 
+-- При создании установите его в состояние offline.
+-- Затем переведите табличное пространство в состояние online. 
+-- Выделите пользователю XXX квоту 2m в пространстве XXX_QDATA. 
+-- От имени XXX в  пространстве XXX_T1создайте таблицу из двух столбцов, 
+-- один из которых будет являться первичным ключом. В таблицу добавьте 3 строки.
+
+drop tablespace KNI_QDATA including contents and datafiles;
+
+create tablespace KNI_QDATA
+    datafile 'KNI_QDATA.dbf'
+    size 10M
+    autoextend on
+    next 5M
+    maxsize 20M
+    offline;
+
+SHOW CON_NAME;
+
+alter tablespace KNI_QDATA online;
+select tablespace_name, status, contents logging from SYS.DBA_TABLESPACES;
+alter user C##KNI quota 2m on KNI_QDATA;
+
+-- Для проверки квоты
+select tablespace_name, bytes, max_bytes
+from dba_ts_quotas
+where tablespace_name = 'KNI_QDATA'
+and username = 'C##KNI';
+
+select * from dba_users;
+
+create table KNI_T1 (
+    x integer primary key,
+    y integer
+) tablespace KNI_QDATA;
+
+insert into KNI_T1(x, y) values (1, 2);
+insert into KNI_T1(x, y) values (2, 3);
+insert into KNI_T1(x, y) values (3, 4);
+
+select * from KNI_T1;
+
+-- 3. Получите список сегментов табличного пространства  XXX_QDATA. 
+-- Определите сегмент таблицы XXX_T1. Определите остальные сегменты.
+select * from dba_segments where tablespace_name = 'KNI_QDATA';
+
+--4
+drop table KNI_T1;
+
+select * from dba_segments where tablespace_name = 'KNI_QDATA';
+select * from USER_RECYCLEBIN;
+
+-- 5. Восстановите (FLASHBACK) удаленную таблицу. 
+
+flashback table KNI_T1 to before drop;
+
+-- 6. Выполните PL/SQL-скрипт, заполняющий таблицу XXX_T1 данными (10000 строк). 
+
+declare
+    i integer := 4;
+begin
+    while i < 10004 loop
+        insert into KNI_T1(x, y) values (i, i);
+        i := i + 1;
+    end loop;
+end;
+
+select count(*) from KNI_T1;
+
+-- 7. Определите сколько в сегменте таблицы XXX_T1 экстентов, их размер в блоках и байтах. 
+-- Получите перечень всех экстентов. 
+select extents, bytes, blocks from dba_segments where segment_name = 'KNI_T1';
+select * from dba_extents where segment_name = 'KNI_T1';
+
+-- 8. Удалите табличное пространство XXX_QDATA и его файл. 
+drop tablespace KNI_QDATA including contents and datafiles;
+
+-- 9. Получите перечень всех групп журналов повтора. Определите текущую группу журналов повтора.
+
+select group# from v$logfile;
+select group# from v$log where status = 'CURRENT';
+
+-- 10. Получите перечень файлов всех журналов повтора инстанса.
+select member from v$logfile;
+
+-- 11. EX. С помощью переключения журналов повтора пройдите полный цикл переключений. 
+-- Запишите серверное время в момент вашего первого переключения (оно понадобится для выполнения следующих заданий).
+
+select group#, status from v$log;
+alter system switch logfile;
+select TO_CHAR(SYSDATE, 'HH24:MI DD MONTH YYYY') as current_date from DUAL;
+--10:01 26 ОКТЯБРЬ  2023
+select group# from v$log where status = 'CURRENT';
+
+-- 12. EX. Создайте дополнительную группу журналов повтора с тремя файлами журнала. 
+-- Убедитесь в наличии группы и файлов, а также в работоспособности группы (переключением). 
+-- Проследите последовательность SCN. 
+
+alter database add logfile 
+    group 4 
+    'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04.LOG'
+    size 50m 
+    blocksize 512;  
+
+-- Проверка
+SELECT GROUP#, MEMBER
+FROM V$LOGFILE;
+
+alter database add logfile 
+    member 
+    'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04_1.LOG' 
+    to group 4;
+    
+alter database add logfile 
+    member 
+    'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04_2.LOG' 
+    to group 4;
+    
+alter database add logfile 
+    member 
+    'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04_3.LOG' 
+    to group 4;
+    
+    
+select * from V$LOG order by GROUP#;
+select * from V$LOGFILE order by GROUP#;
+alter system switch logfile;
+select group#, status from V$LOG;
+select group# from V$LOG where status = 'CURRENT';
+
+
+-- 13. EX. Удалите созданную группу журналов повтора. Удалите созданные вами файлы журналов на сервере.
+alter database drop logfile member 'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04_3.LOG';
+alter database drop logfile member 'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04_2.LOG';
+alter database drop logfile member 'C:\ORACLE\oradata\ORCL\ONLINELOG\REDO04_1.LOG';
+alter database drop logfile group 4;
+
+-- 14. Определите, выполняется или нет архивирование журналов повтора 
+-- (архивирование должно быть отключено, иначе дождитесь, пока другой студент выполнит задание и отключит).
+
+
+select DBID, NAME, LOG_MODE from V$DATABASE;
+select INSTANCE_NAME, ARCHIVER, ACTIVE_STATE from V$INSTANCE;
+
+-- 15. Определите номер последнего архива.
+select * from V$ARCHIVED_LOG;
+
+--16
+-- shutdown immediate;
+-- startup mount;
+-- alter database archivelog;
+-- alter database open;
+
+-- Теперь будут значения: LOG_MODE = ARCHIVELOG; ARCHIVER = STARTED
+select DBID, NAME, LOG_MODE from V$DATABASE;
+select INSTANCE_NAME, ARCHIVER, ACTIVE_STATE from V$INSTANCE;
+
+-- 17. EX. Принудительно создайте архивный файл. Определите его номер. 
+-- Определите его местоположение и убедитесь в его наличии. 
+-- Проследите последовательность SCN в архивах и журналах повтора. 
+
+alter system switch logfile;
+select group# from V$LOG where status = 'CURRENT';
+select * from V$ARCHIVED_LOG;
+
+--18
+-- shutdown immediate;
+-- startup mount;
+-- alter database noarchivelog;
+-- alter database open;
+
+-- Теперь опять будут значения: LOG_MODE = NOARCHIVELOG; ARCHIVER = STOPPED
+select DBID, name, LOG_MODE from V$DATABASE;
+select INSTANCE_NAME, ARCHIVER, ACTIVE_STATE from V$INSTANCE;
+
+-- 19. Получите список управляющих файлов.
+select * from V$CONTROLFILE;
+
+-- 20. Получите и исследуйте содержимое управляющего файла. Поясните известные вам параметры в файле.
+
+-- Путь C:\ORACLE\oradata\ORCL\CONTROLFILE\O1_MF_LMMZYXD6_.CTL
+show parameter control_files;
+select * from V$CONTROLFILE_RECORD_SECTION;
+
+-- 21. Определите местоположение файла параметров инстанса. Убедитесь в наличии этого файла.
+-- Путь C:\ORACLEINSTALLER\DATABASE\SPFILEORCL.ORA 
+show parameter pfile;
+
+select NAME, DESCRIPTION from V$PARAMETER;
+
+-- 22. Сформируйте PFILE с именем XXX_PFILE.ORA. 
+-- Исследуйте его содержимое. Поясните известные вам параметры в файле.
+
+-- Путь C:\oracleinstaller\database\KNI_PFILE.ora
+create pfile = 'KNI_PFILE.ora' from spfile;
+
+-- 23. Определите местоположение файла паролей инстанса. Убедитесь в наличии этого файла.
+select * from V$PWFILE_USERS;     -- пользователи и их роли в файле паролей
+show parameter remote_login_passwordfile;   -- exclusive/shared/none
+
+-- 24. Получите перечень директориев для файлов сообщений и диагностики.
+-- Файл сообщений (протоколы работы, дампы, трассировки)
+select * from V$DIAG_INFO;
+
+-- 25. Найдите и исследуйте содержимое протокола работы инстанса (LOG.XML), 
+-- найдите в нем команды переключения журналов которые вы выполняли.

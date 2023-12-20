@@ -1,0 +1,9 @@
+﻿  pch.cpp
+  COM.cpp
+  dllmain.cpp
+  ImplClass.cpp
+  ImplClassFactory.cpp
+  Install.cpp
+  Registry.cpp
+  Создание кода...
+  SP02_COM.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab4\COM\SP02_COM\Debug\SP02_COM.dll

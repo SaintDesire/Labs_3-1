@@ -1,0 +1,11 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppClean.targets(77,5): warning : Отказано в доступе по пути "c:\users\nikita\desktop\labs_3-1\sp\lab6\x64\debug\os14_htcom.dll".
+  pch.cpp
+  ClassFactory.cpp
+  ComponentHT.cpp
+  dllmain.cpp
+  ExportFunctions.cpp
+  Registry.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\OS14_HTCOM\Registry.cpp(144,24): warning C4267: аргумент: преобразование из "size_t" в "DWORD"; возможна потеря данных
+  Создание кода...
+     Создается библиотека C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\x64\Debug\OS14_HTCOM.lib и объект C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\x64\Debug\OS14_HTCOM.exp
+  OS14_HTCOM.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\x64\Debug\OS14_HTCOM.dll

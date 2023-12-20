@@ -1,0 +1,4 @@
+﻿  main.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\OS_0402\main.cpp(65,97): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\OS_0402\main.cpp(27): warning C4172: возвращение адреса локальной или временной переменной : wc
+  OS_0402.vcxproj -> C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\x64\Debug\OS_0402.exe

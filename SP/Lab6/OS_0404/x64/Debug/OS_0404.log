@@ -1,0 +1,6 @@
+﻿  main.cpp
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\OS_0404\main.cpp(64,121): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\OS_0404\main.cpp(70,88): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Nikita\Desktop\Labs_3-1\SP\Lab6\OS_0404\main.cpp(27): warning C4172: возвращение адреса локальной или временной переменной : wc
+LINK : fatal error LNK1104: не удается открыть файл "../x64/Debug/OS14_HTCOM_LIB.lib"
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1134,5): error MSB6006: "link.exe" завершилась с кодом 1104.
