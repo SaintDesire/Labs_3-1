@@ -46,6 +46,7 @@ public class WebSiteTest {
         homePage.submitButtonClick();
         Thread.sleep(2000);
         Assert.assertTrue(homePage.isRequestAccepted());
+<<<<<<< HEAD
 
     }
 //
@@ -64,6 +65,25 @@ public class WebSiteTest {
 //
 //        assert productPage.isAddedButtonDisplayed();
 //    }
+=======
+    }
+
+    @Test
+    public void addToFavouriteTest() {
+        homePage.openWebsite("https://7745.by/");
+
+        homePage.enterSearchText("iphone");
+        homePage.clickSearchButton();
+
+        productPage.hoverOverBuyButton();
+        productPage.scrollIntoView(productPage.getBuyButton());
+        productPage.clickBuyButton();
+
+        productPage.clickProductLink();
+
+        assert productPage.isAddedButtonDisplayed();
+    }
+>>>>>>> ffe73ebac4a05c9d1662f4492b236e7fe909f1d6
 
     @AfterMethod
     public void tearDown() {

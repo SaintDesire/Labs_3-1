@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 package pages;
+=======
+package page;
+>>>>>>> ffe73ebac4a05c9d1662f4492b236e7fe909f1d6
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -68,11 +72,18 @@ public class HomePage {
             js.executeScript("arguments[0].scrollIntoViewIfNeeded();", submitButtonElement);
             Actions actions = new Actions(driver);
             actions.moveToElement(submitButtonElement).click().perform();
+<<<<<<< HEAD
             Thread.sleep(5000);
             driver.switchTo().frame(driver.findElement(By.cssSelector("iframe[title='reCAPTCHA']")));
             WebElement captchaCheckbox = driver.findElement(By.xpath("//span[@id='recaptcha-anchor']/div[@class='recaptcha-checkbox-border']"));
             captchaCheckbox.click();
             Thread.sleep(10000);
+=======
+            Thread.sleep(2000);
+            driver.switchTo().frame(driver.findElement(By.cssSelector("iframe[title='reCAPTCHA']")));
+            WebElement captchaCheckbox = driver.findElement(By.xpath("//span[@id='recaptcha-anchor']/div[@class='recaptcha-checkbox-border']"));
+            captchaCheckbox.click();
+>>>>>>> ffe73ebac4a05c9d1662f4492b236e7fe909f1d6
             driver.switchTo().defaultContent();
             Thread.sleep(2000);
             submitButton.click();

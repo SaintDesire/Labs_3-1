@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <title>Test</title>
+</head>
+<body>
+
+<input type="text" id="search-input" placeholder="Введите название улицы">
+    <ul id="suggestions-list">
+    </ul>
+
+<a href="{% url 'search_street' %}">Ссылка</a>
+
+    {% for hint in hints %}
+        <p>{{hint}}</p>
+    {% endfor %}
+
+
+
+<h1>Hello World</h1>
+<div id="map" style="height: 400px;"></div>
+<script>
+   {# // Создание карты#}
+   {# var map = L.map('map').setView([53.89155, 27.55940], 13);#}
+   {##}
+   {# // Добавление слоя тайлов#}
+   {# L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {#}
+   {#     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',#}
+   {#     maxZoom: 18,#}
+   {# }).addTo(map);#}
+   {##}
+   {# // Добавление маркера#}
+   {# var marker = L.marker([53.89155, 27.55940]).addTo(map); // Задайте координаты маркера#}
+   {##}
+   {# // Обработчик события клика по карте#}
+   {# map.on('click', function(e) {#}
+   {#     // Получение координат клика#}
+   {#     var lat = e.latlng.lat;#}
+   {#     var lng = e.latlng.lng;#}
+   {##}
+   {#marker.bindPopup("<b>Привет!</b><br>Это всплывающая информация при нажатии на маркер.").openPopup();#}
+   {#     // Отправка координат на сервер (AJAX-запрос или форма)#}
+   {#     // ...#}
+   {# });#}
+
+
+        // Добавление плагина для меню ввода адреса
+        var control = L.control.geocoder({
+            defaultMarkGeocode: false,
+        }).on('markgeocode', function(e) {
+            var latLng = e.geocode.center;
+            L.marker(latLng).addTo(map);
+        }).addTo(map);
+
+
+const searchInput = document.getElementById('search-input');
+const suggestionsList = document.getElementById('suggestions-list');
+const hints = [{% for hint in hints %}"{{ hint }}",{% endfor %}];
+
+searchInput.addEventListener('input', handleInput);
+
+function handleInput() {
+    const inputValue = searchInput.value.toLowerCase();
+    const filteredHints = hints.filter(hint => hint.toLowerCase().includes(inputValue));
+
+    suggestionsList.innerHTML = ''; // Очищаем содержимое списка ul
+
+    filteredHints.forEach(hint => {
+        const li = document.createElement('li');
+        li.textContent = hint;
+        suggestionsList.appendChild(li);
+    });
+}
+
+</script>
+</body>
+</html>

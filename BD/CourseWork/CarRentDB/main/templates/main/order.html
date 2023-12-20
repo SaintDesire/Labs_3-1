@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        h1, h2, p {
+            margin: 0;
+            padding: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+        }
+
+        p {
+            font-size: 18px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #cccccc;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid grey;
+            width: 100%;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+            color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1><a href="{% url 'home' %}" style="padding: 10px 5px; border-radius: 5px; color: white; text-decoration: none">Главная</a></h1>
+    <h1>Аренда авто</h1>
+    <h1>Информация о машине</h1>
+
+    <h2>{{ car.brand }} {{ car.model }}</h2>
+    <p>Цвет: {{ car.color }}</p>
+    <p>Год выпуска: {{ car.year }}</p>
+    <p>Статус: {{ car.status }}</p>
+    <p>Номер: {{ car.number }}</p>
+    <p>Местоположение: {{ car.location.address }}</p>
+
+    <!-- Форма для внесения записи в таблицу -->
+    <form action="{% url 'addRent' %}" method="POST">
+        {% csrf_token %}
+        <label for="car_id">ID авто:</label>
+        <input type="text" name="car_id" id="car_id" value="{{ car.car_id }}" readonly>
+
+        <label for="user_id">ID пользователя:</label>
+        <input type="text" name="user_id" id="user_id" value="{{ current_user.user_id }}">
+
+        <label for="start_date">Дата начала аренды:</label>
+        <input type="date" name="start_date" id="start_date" min="{{ today }}" value="{{ today }}" max="{{ max_day }}">
+
+        <label for="end_date">Дата окончания аренды:</label>
+        <input type="date" name="end_date" id="end_date" min="{{ tomorrow }}" value="{{ tomorrow }}" max="{{ max_day }}">
+
+        <label for="total_cost">Общая стоимость:</label>
+        <input type="text" name="total_cost" id="total_cost" readonly>
+
+        <input type="submit" value="Добавить запись">
+    </form>
+
+    <p style="display: none" id="price_per_day">{{ car.price }}</p>
+<script>
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const totalCostInput = document.getElementById('total_cost');
+    const pricePerDayElement = document.getElementById('price_per_day');
+    const pricePerDay = parseInt(pricePerDayElement.innerText);
+
+    function calculateTotalCost() {
+      const startDate = new Date(startDateInput.value);
+      const endDate = new Date(endDateInput.value);
+      if (startDate >= endDate) {
+        const newEndDate = new Date(startDate);
+        newEndDate.setDate(startDate.getDate() + 1);
+        endDateInput.value = newEndDate.toISOString().split('T')[0];
+        totalCostInput.value = pricePerDay;
+      } else {
+          const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+          const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+          const totalCost = diffDays * pricePerDay;
+          totalCostInput.value = totalCost;
+      }
+
+
+    }
+
+    calculateTotalCost();
+    startDateInput.addEventListener('change', calculateTotalCost);
+    endDateInput.addEventListener('change', calculateTotalCost);
+
+</script>
+</body>
+</html>

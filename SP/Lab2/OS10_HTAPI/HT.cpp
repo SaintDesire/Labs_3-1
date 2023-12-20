@@ -219,7 +219,14 @@ namespace ht
 		return foundElement;
 	}
 
+<<<<<<< HEAD
 	BOOL insert(HtHandle* htHandle, const Element* element)
+=======
+	BOOL insert		// добавить элемент в хранилище
+	(
+		HtHandle* htHandle,            // управление HT
+		const Element* element)              // элемент
+>>>>>>> ffe73ebac4a05c9d1662f4492b236e7fe909f1d6
 	{
 		if (htHandle->count >= htHandle->capacity)
 		{
@@ -230,6 +237,7 @@ namespace ht
 		WaitForSingleObject(htHandle->mutex, INFINITE);
 		int freeIndex = findFreeIndex(htHandle, element);
 		if (freeIndex < 0)
+<<<<<<< HEAD
 		{
 			ReleaseMutex(htHandle->mutex);
 			return false;
@@ -241,6 +249,9 @@ namespace ht
 			ReleaseMutex(htHandle->mutex);
 			return false;
 		}
+=======
+			return false;
+>>>>>>> ffe73ebac4a05c9d1662f4492b236e7fe909f1d6
 
 		writeToMemory(htHandle, element, freeIndex);
 		incrementCount(htHandle);
