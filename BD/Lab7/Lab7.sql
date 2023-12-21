@@ -2,29 +2,29 @@
 -- пользовател€ XXX (у каждого студента собственный пользователь и инфраструктура) 
 -- в своей PDB.
 
-alter pluggable database KNI_PDB open;
-alter session set container = KNI_PDB;
+alter pluggable database KNI_USER_PDB open;
+alter session set container = KNI_USER_PDB;
 show con_name;
 
-create tablespace TS_KNI
-  DATAFILE 'TS_KNI_LAB7_PDB.dbf'
+create tablespace TS_KNI_USER
+  DATAFILE 'TS_KNI_USER_LAB7_PDB.dbf'
   size 7M
   autoextend ON
   next 5M
   maxsize 20M;
 
-create temporary tablespace TS_KNI_TEMP
-  tempfile 'TS_KNI_TEMP_LAB7_PDB.dbf'
+create temporary tablespace TS_KNI_USER_TEMP
+  tempfile 'TS_KNI_USER_TEMP_LAB7_PDB.dbf'
   size 5M
   autoextend ON
   next 3M
   maxsize 30M;
 
 select TABLESPACE_NAME, STATUS, contents logging from SYS.DBA_TABLESPACES;
-drop tablespace TS_KNI including contents and datafiles;
-drop tablespace TS_KNI_TEMP including contents and datafiles;
+drop tablespace TS_KNI_USER including contents and datafiles;
+drop tablespace TS_KNI_USER_TEMP including contents and datafiles;
 
-CREATE PROFILE PF_KNI LIMIT
+CREATE PROFILE PF_KNI_USER LIMIT
   FAILED_LOGIN_ATTEMPTS 7
   SESSIONS_PER_USER 3
   PASSWORD_LIFE_TIME 60
@@ -32,32 +32,32 @@ CREATE PROFILE PF_KNI LIMIT
   PASSWORD_LOCK_TIME 1
   CONNECT_TIME 180;
 
-select * from DBA_PROFILES where profile = 'PF_KNI';
-drop profile PF_KNI;
+select * from DBA_PROFILES where profile = 'PF_KNI_USER';
+drop profile PF_KNI_USER;
 
 
-CREATE USER KNI identified by 111
-  DEFAULT TABLESPACE TS_KNI
-  TEMPORARY TABLESPACE TS_KNI_TEMP
-  PROFILE PF_KNI
+CREATE USER KNI_USER identified by 111
+  DEFAULT TABLESPACE TS_KNI_USER
+  TEMPORARY TABLESPACE TS_KNI_USER_TEMP
+  PROFILE PF_KNI_USER
   ACCOUNT UNLOCK;
 
-select * from dba_users where USERNAME like 'KNI';
-drop user KNI;
+select username from dba_users where USERNAME like 'KNI_USER';
+drop user KNI_USER;
 
 -- 1. ѕрочитайте задание полностью и выдайте своему пользователю необходимые права.
-GRANT CREATE SESSION TO KNI;
-GRANT RESTRICTED SESSION TO KNI;
-GRANT CREATE ANY TABLE TO KNI;
-GRANT CREATE ANY VIEW TO KNI;
-GRANT CREATE SEQUENCE TO KNI;
-GRANT UNLIMITED TABLESPACE TO KNI;
-GRANT CREATE CLUSTER TO KNI;
-GRANT CREATE SYNONYM TO KNI;
-GRANT CREATE PUBLIC SYNONYM TO KNI;
-GRANT CREATE MATERIALIZED VIEW TO KNI;
+GRANT CREATE SESSION TO KNI_USER;
+GRANT RESTRICTED SESSION TO KNI_USER;
+GRANT CREATE ANY TABLE TO KNI_USER;
+GRANT CREATE ANY VIEW TO KNI_USER;
+GRANT CREATE SEQUENCE TO KNI_USER;
+GRANT UNLIMITED TABLESPACE TO KNI_USER;
+GRANT CREATE CLUSTER TO KNI_USER;
+GRANT CREATE SYNONYM TO KNI_USER;
+GRANT CREATE PUBLIC SYNONYM TO KNI_USER;
+GRANT CREATE MATERIALIZED VIEW TO KNI_USER;
 
-select * from USER_SYS_PRIVS where username = 'KNI';
+select * from USER_SYS_PRIVS where username = 'KNI_USER';
 
 
 
@@ -139,7 +139,7 @@ select S4.NEXTVAL from DUAL;
 
 -- 7. ѕолучите список всех последовательностей в словаре базы данных, 
 -- владельцем которых €вл€етс€ пользователь XXX.
-SELECT * FROM ALL_SEQUENCES WHERE SEQUENCE_OWNER = 'KNI';
+SELECT * FROM ALL_SEQUENCES WHERE SEQUENCE_OWNER = 'KNI_USER';
 DROP SEQUENCE S1;
 DROP SEQUENCE S2;
 DROP SEQUENCE S3;
@@ -155,7 +155,7 @@ CREATE TABLE T1 (
   N2 NUMBER(20),
   N3 NUMBER(20),
   N4 NUMBER(20)
-) CACHE STORAGE ( BUFFER_POOL KEEP ) tablespace TS_KNI;
+) CACHE STORAGE ( BUFFER_POOL KEEP ) tablespace TS_KNI_USER;
 
 
 alter sequence s1 restart;
@@ -216,13 +216,13 @@ SELECT TABLE_NAME FROM USER_TABLES;
 SELECT CLUSTER_NAME FROM USER_CLUSTERS;
 
 -- 14. —оздайте частный синоним дл€ таблицы XXX.— и продемонстрируйте его применение.
-CREATE SYNONYM SC FOR KNI.C;
+CREATE SYNONYM SC FOR KNI_USER.C;
 SELECT * FROM C;
 SELECT * FROM SC;
 drop synonym SC;
 
 -- 15. —оздайте публичный синоним дл€ таблицы XXX.B и продемонстрируйте его применение.
-CREATE PUBLIC SYNONYM SB FOR KNI.B;
+CREATE PUBLIC SYNONYM SB FOR KNI_USER.B;
 SELECT * FROM SB;
 
 

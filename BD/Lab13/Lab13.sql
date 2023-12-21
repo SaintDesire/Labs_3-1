@@ -1,55 +1,54 @@
--- РџР°СЂСѓ РјРѕРјРµРЅС‚РѕРІ:
--- 1) РСЃРїРѕР»СЊР·СѓРµРј РєРѕРЅРЅРµРєС‚, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р±РѕС‚Р°Р»Рё РІ 8 Р»Р°Р±Рµ
+-- Пару моментов:
+-- 1) Используем коннект, в котором работали в 8 лабе
 
-alter pluggable database TDS_PDB open;
+alter pluggable database KNI_USER_PDB open;
+show con_name;
 ALTER SESSION SET nls_date_format='dd-mm-yyyy hh24:mi:ss';
 
--- Рљ РіСЂР°РЅРґР°Рј СЃ РїСЂРѕС€Р»С‹С… Р»Р°Р± РґРѕР±Р°РІР»СЏРµРј
-GRANT CREATE TABLESPACE TO TDS;
-GRANT ALTER TABLESPACE TO TDS;
+GRANT CREATE TABLESPACE TO KNI_USER;
+GRANT ALTER TABLESPACE TO KNI_USER;
 
 create tablespace t1
-    datafile 't1_tds.dbf'
+    datafile 't1_KNI_USER.dbf'
     size 7 m
     autoextend on
     maxsize unlimited
     extent management local;
 
 create tablespace t2
-    datafile 't2_tds.dbf'
+    datafile 't2_KNI_USER.dbf'
     size 7 m
     autoextend on
     maxsize unlimited
     extent management local;
 
 create tablespace t3
-    datafile 't3_tds.dbf'
+    datafile 't3_KNI_USER.dbf'
     size 7 m
     autoextend on
     maxsize unlimited
     extent management local;
 
 create tablespace t4
-    datafile 't4_tds.dbf'
+    datafile 't4_KNI_USER.dbf'
     size 7 m
     autoextend on
     maxsize unlimited
     extent management local;
 
     
--- РўРѕР¶Рµ РѕС‚ SYS
-alter user TDS quota unlimited on t1;
-alter user TDS quota unlimited on t2;
-alter user TDS quota unlimited on t3;
-alter user TDS quota unlimited on t4;
+alter user KNI_USER quota unlimited on t1;
+alter user KNI_USER quota unlimited on t2;
+alter user KNI_USER quota unlimited on t3;
+alter user KNI_USER quota unlimited on t4;
 
 --drop tablespace t1 including contents and datafiles;
 --drop tablespace t2 including contents and datafiles;
 --drop tablespace t3 including contents and datafiles;
 --drop tablespace t4 including contents and datafiles;
 
--- 1. РЎРѕР·РґР°Р№С‚Рµ С‚Р°Р±Р»РёС†Сѓ T_RANGE c РґРёР°РїР°Р·РѕРЅРЅС‹Рј СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёРµРј. 
--- РСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»СЋС‡ СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ С‚РёРїР° NUMBER.
+-- 1. Создайте таблицу T_RANGE c диапазонным секционированием. 
+-- Используйте ключ секционирования типа NUMBER.
 drop table T_RANGE;
 create table T_RANGE
 (
@@ -80,8 +79,8 @@ select TABLE_NAME, PARTITION_NAME, HIGH_VALUE, TABLESPACE_NAME
 from USER_TAB_PARTITIONS
 where table_name = 'T_RANGE';
 
--- 2. РЎРѕР·РґР°Р№С‚Рµ С‚Р°Р±Р»РёС†Сѓ T_INTERVAL c РёРЅС‚РµСЂРІР°Р»СЊРЅС‹Рј СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёРµРј. 
--- РСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»СЋС‡ СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ С‚РёРїР° DATE.
+-- 2. Создайте таблицу T_INTERVAL c интервальным секционированием. 
+-- Используйте ключ секционирования типа DATE.
 drop table T_INTERVAL;
 create table T_INTERVAL
 (
@@ -108,14 +107,13 @@ commit;
 select * from T_INTERVAL partition (p0);
 select * from T_INTERVAL partition (p1);
 select * from T_INTERVAL partition (p2);
-select * from T_INTERVAL partition (SYS_P576);
 
 select TABLE_NAME, PARTITION_NAME, HIGH_VALUE, TABLESPACE_NAME
 from USER_TAB_PARTITIONS
 where table_name = 'T_INTERVAL';
 
--- 3. РЎРѕР·РґР°Р№С‚Рµ С‚Р°Р±Р»РёС†Сѓ T_HASH c С…СЌС€-СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёРµРј. 
--- РСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»СЋС‡ СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ С‚РёРїР° VARCHAR2.
+-- 3. Создайте таблицу T_HASH c хэш-секционированием. 
+-- Используйте ключ секционирования типа VARCHAR2.
 drop table T_HASH;
 create table T_HASH
 (
@@ -148,8 +146,8 @@ select TABLE_NAME, PARTITION_NAME, HIGH_VALUE, TABLESPACE_NAME
 from USER_TAB_PARTITIONS
 where table_name = 'T_HASH';
 
--- 4. РЎРѕР·РґР°Р№С‚Рµ С‚Р°Р±Р»РёС†Сѓ T_LIST СЃРѕ СЃРїРёСЃРѕС‡РЅС‹Рј СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёРµРј. 
--- РСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»СЋС‡ СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ С‚РёРїР° CHAR.
+-- 4. Создайте таблицу T_LIST со списочным секционированием. 
+-- Используйте ключ секционирования типа CHAR.
 drop table T_LIST;
 create table T_LIST
 (
@@ -175,14 +173,12 @@ select * from T_list partition (l1);
 select * from T_list partition (l2);
 select * from T_list partition (l3);
 
--- 5. Р’РІРµРґРёС‚Рµ СЃ РїРѕРјРѕС‰СЊСЋ РѕРїРµСЂР°С‚РѕСЂРѕРІ INSERT РґР°РЅРЅС‹Рµ РІ С‚Р°Р±Р»РёС†С‹ T_RANGE, T_INTERVAL, T_HASH, T_LIST. 
--- Р”Р°РЅРЅС‹Рµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ С‚Р°РєРёРјРё, С‡С‚РѕР±С‹ РѕРЅРё СЂР°Р·РјРµСЃС‚РёР»РёСЃСЊ РїРѕ РІСЃРµРј СЃРµРєС†РёСЏРј. 
--- РџСЂРѕРґРµРјРѕРЅСЃС‚СЂРёСЂСѓР№С‚Рµ СЌС‚Рѕ СЃ РїРѕРјРѕС‰СЊСЋ SELECT Р·Р°РїСЂРѕСЃР°.
+-- 5. Введите с помощью операторов INSERT данные в таблицы T_RANGE, T_INTERVAL, T_HASH, T_LIST. 
+-- Данные должны быть такими, чтобы они разместились по всем секциям. 
+-- Продемонстрируйте это с помощью SELECT запроса.
 
--- РџРѕРєР°Р·Р°Р» РІ РїСЂРѕС€Р»С‹С… Р·Р°РґР°РЅРёСЏС…
-
--- 6. РџСЂРѕРґРµРјРѕРЅСЃС‚СЂРёСЂСѓР№С‚Рµ РґР»СЏ РІСЃРµС… С‚Р°Р±Р»РёС† РїСЂРѕС†РµСЃСЃ РїРµСЂРµРјРµС‰РµРЅРёСЏ СЃС‚СЂРѕРє РјРµР¶РґСѓ СЃРµРєС†РёСЏРјРё, 
--- РїСЂРё РёР·РјРµРЅРµРЅРёРё (РѕРїРµСЂР°С‚РѕСЂ UPDATE) РєР»СЋС‡Р° СЃРµРєС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ.
+-- 6. Продемонстрируйте для всех таблиц процесс перемещения строк между секциями, 
+-- при изменении (оператор UPDATE) ключа секционирования.
 alter table T_RANGE enable row movement;
 select * from T_RANGE partition(PMAX);
 update T_RANGE set id=2 where id=300;
@@ -203,18 +199,18 @@ select * from T_LIST partition(l0);
 update T_LIST set obj='b' where obj='a';
 select * from T_LIST partition(l1);
 
--- 7. Р”Р»СЏ РѕРґРЅРѕР№ РёР· С‚Р°Р±Р»РёС† РїСЂРѕРґРµРјРѕРЅСЃС‚СЂРёСЂСѓР№С‚Рµ РґРµР№СЃС‚РІРёРµ РѕРїРµСЂР°С‚РѕСЂР° ALTER TABLE MERGE.
+-- 7. Для одной из таблиц продемонстрируйте действие оператора ALTER TABLE MERGE.
 alter table T_RANGE merge partitions p1, p2 into partition p5 tablespace t4;
 select * from T_RANGE partition(p5);
 
--- 8. Р”Р»СЏ РѕРґРЅРѕР№ РёР· С‚Р°Р±Р»РёС† РїСЂРѕРґРµРјРѕРЅСЃС‚СЂРёСЂСѓР№С‚Рµ РґРµР№СЃС‚РІРёРµ РѕРїРµСЂР°С‚РѕСЂР° ALTER TABLE SPLIT.
+-- 8. Для одной из таблиц продемонстрируйте действие оператора ALTER TABLE SPLIT.
 alter table T_RANGE split partition p5 at (200)
 into (partition p1 tablespace t1, partition p2 tablespace t2);
 select * from T_RANGE partition(p5);
 select * from T_RANGE partition(p1);
 select * from T_RANGE partition(p2);
 
--- 9. Р”Р»СЏ РѕРґРЅРѕР№ РёР· С‚Р°Р±Р»РёС† РїСЂРѕРґРµРјРѕРЅСЃС‚СЂРёСЂСѓР№С‚Рµ РґРµР№СЃС‚РІРёРµ РѕРїРµСЂР°С‚РѕСЂР° ALTER TABLE EXCHANGE.
+-- 9. Для одной из таблиц продемонстрируйте действие оператора ALTER TABLE EXCHANGE.
 drop table T_RANGE1;
 create table T_RANGE1
 (
