@@ -32,6 +32,12 @@ current_user = {
     "address": "",
     "password": ""
 }
+def generate_start_data():
+    import_streets_from_xml()
+    addNewCars(1000)
+    fillUsersTable(500)
+    generate_orders(3000)
+    return
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(current_dir, 'static', 'main', 'xml', 'data.xml')
@@ -256,6 +262,8 @@ def update_account(request):
                 user_obj.phone = user['phone_number']
             if user['address_id'] != user_obj.address:
                 user_obj.address = location
+            if user['email'] != user_obj.email and email_validate:
+                user_obj.email = email
             if data['old_password'] is not '' and data['new_password'] is not '':
                 try:
                     enc_password = encrypt_decrypt_password(data['old_password'], 15)
@@ -371,9 +379,9 @@ def addRent(request):
         model = f"{car.brand} {car.model}"  # Объединение значений brand и model в одну строку
 
         car_node_data = {
-            "car": car_id,
-            "user_id": user_id,
-            "income": total_cost,
+            "car": str(car_id),
+            "user_id": str(user_id),
+            "income": str(total_cost),
             "model": model
         }
         car_node = Node(data=car_node_data)
@@ -638,8 +646,8 @@ def encrypt_decrypt_password(password, key):
 
 def generate_orders(num_rows):
     for _ in range(num_rows):
-        car_id = random.randint(1, 100)
-        user_id = random.randint(1, 1000)
+        car_id = random.randint(1, 500)
+        user_id = random.randint(1, 500)
         start_date = datetime.now() + timedelta(days=random.randint(1, 30))
         end_date = start_date + timedelta(days=random.randint(1, 7))
         total_cost = random.randint(100, 1000)
@@ -653,9 +661,9 @@ def generate_orders(num_rows):
         model = f"{car.brand} {car.model}"
 
         car_node_data = {
-            "car": car_id,
-            "user_id": user_id,
-            "income": total_cost,
+            "car": str(car_id),
+            "user_id": str(user_id),
+            "income": str(total_cost),
             "model": model
         }
         car_node = Node(data=car_node_data)

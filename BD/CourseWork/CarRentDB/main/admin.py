@@ -49,7 +49,7 @@ class NodeAdmin(admin.ModelAdmin):
 
     def user_count(self, obj):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT count(data->>'user') AS user FROM main_node;")
+            cursor.execute("SELECT count(data->>'user') AS user FROM node;")
             result = cursor.fetchone()
             return result[0] if result else None
 
@@ -57,7 +57,7 @@ class NodeAdmin(admin.ModelAdmin):
 
     def transaction_count(self, obj):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT count(data->>'car') AS transaction FROM main_node;")
+            cursor.execute("SELECT count(data->>'car') AS transaction FROM node;")
             result = cursor.fetchone()
             return result[0] if result else None
 
@@ -67,7 +67,7 @@ class NodeAdmin(admin.ModelAdmin):
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT data->>'car' AS car, COUNT(*) AS popularity
-                FROM main_node
+                FROM node
                 GROUP BY data->>'car'
                 ORDER BY popularity DESC;
             """)
@@ -75,7 +75,7 @@ class NodeAdmin(admin.ModelAdmin):
 
     def total_income(self, obj):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT SUM((data->>'income')::NUMERIC) AS total_income FROM main_node;")
+            cursor.execute("SELECT SUM((data->>'income')::NUMERIC) AS total_income FROM node;")
             result = cursor.fetchone()
             return result[0] if result else None
 
@@ -93,11 +93,17 @@ class EdgeAdmin(admin.ModelAdmin):
 
     user_id.short_description = 'User ID'
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('previous_node__data__user')
+        return qs
+
+
     def car_count(self, obj):
         with connection.cursor() as cursor:
             query = """
                 SELECT COUNT(*) AS count
-                FROM main_edge
+                FROM edge
                 WHERE previous_node_id = %s;
             """
             cursor.execute(query, [obj.previous_node_id])
@@ -110,7 +116,7 @@ class EdgeAdmin(admin.ModelAdmin):
         with connection.cursor() as cursor:
             query = """
                  SELECT next_node_id
-                 FROM main_edge
+                 FROM edge
                  WHERE previous_node_id = %s;
              """
             cursor.execute(query, [obj.previous_node_id])
@@ -129,7 +135,7 @@ class EdgeAdmin(admin.ModelAdmin):
         with connection.cursor() as cursor:
             query = """
                 SELECT next_node_id
-                FROM main_edge
+                FROM edge
                 WHERE previous_node_id = %s;
             """
             cursor.execute(query, [obj.previous_node_id])

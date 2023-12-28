@@ -84,10 +84,10 @@
         </ul>
     {% endif %}
     <div class="container">
-         <form method="post" action="{% url 'login' %}">
+         <form method="post" action="{% url 'login' %}" id="login-form">
             {% csrf_token %}
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email"value="{{ user.email }}" maxlength="100" required>
+            <input type="email" name="email" id="email" value="{{ user.email }}" maxlength="100" required>
 
             <label for="password">Пароль:</label>
             <input type="password" name="password" id="password" maxlength="128" required>
@@ -97,5 +97,38 @@
         </form>
     </div>
 
+<script>
+    function validateEmail() {
+        var emailInput = document.getElementById("email");
+        var email = emailInput.value;
+
+        // Разбиение адреса на части до и после символа @
+        var parts = email.split("@");
+        var username = parts[0];
+        var domain = parts[1];
+
+        // Проверка точки после символа @
+        if (domain.indexOf(".") === -1 || domain.indexOf(".") === 0 || domain.indexOf(".") === domain.length - 1) {
+            alert("Адрес электронной почты должен содержать только одну точку после символа @");
+            return false;
+        }
+
+        // Проверка количества точек после символа @
+        var dotCount = domain.split(".").length - 1;
+        if (dotCount !== 1) {
+            alert("Адрес электронной почты должен содержать только одну точку после символа @");
+            return false;
+        }
+
+        // Валидация успешна
+        return true;
+    }
+
+    document.getElementById("login-form").onsubmit = function(event) {
+        if (!validateEmail()) {
+            event.preventDefault();
+        }
+    };
+</script>
 </body>
 </html>
